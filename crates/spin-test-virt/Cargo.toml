@@ -11,12 +11,12 @@ ipnet = "2.9"
 spin-expressions = { workspace = true }
 spin-manifest = { workspace = true }
 spin-serde = { workspace = true }
-spin-locked-app = { git = "https://github.com/spinframework/spin", rev = "165d6fa1bf971fff3f493f98a0bb859fe0b4689b" }
-spin-outbound-networking-config = { git = "https://github.com/spinframework/spin", rev = "165d6fa1bf971fff3f493f98a0bb859fe0b4689b" }
+spin-locked-app = { git = "https://github.com/spinframework/spin", rev = "78c77f34541f0a7fbfc897e113f64318548e2494" }
+spin-outbound-networking-config = { git = "https://github.com/spinframework/spin", rev = "78c77f34541f0a7fbfc897e113f64318548e2494" }
 toml = { workspace = true }
 wit-bindgen-rt = { workspace = true }
 # rusqlite > 0.25 fails to build with various linker errors
-rusqlite = { version = "0.25", features = ["bundled", "wasm32-wasi-vfs"] }
+# rusqlite = { version = "0.25", features = ["bundled", "wasm32-wasi-vfs"] }
 
 
 [lib]

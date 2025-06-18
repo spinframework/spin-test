@@ -415,30 +415,31 @@ impl sqlite::Guest for Component {
     type Connection = SqliteConnection;
 }
 
-type ConnectionPool = HashMap<String, Arc<Mutex<rusqlite::Connection>>>;
-static SQLITE_CONNECTION_POOL: std::sync::OnceLock<Mutex<ConnectionPool>> =
-    std::sync::OnceLock::new();
+// type ConnectionPool = HashMap<String, Arc<Mutex<rusqlite::Connection>>>;
+// static SQLITE_CONNECTION_POOL: std::sync::OnceLock<Mutex<ConnectionPool>> =
+//     std::sync::OnceLock::new();
 
 struct SqliteConnection {
-    inner: Arc<Mutex<rusqlite::Connection>>,
+    // inner: Arc<Mutex<rusqlite::Connection>>,
 }
 
 impl SqliteConnection {
     fn new(database: String) -> Result<Self, sqlite::Error> {
-        let conn = match SQLITE_CONNECTION_POOL
-            .get_or_init(Default::default)
-            .lock()
-            .unwrap()
-            .entry(database)
-        {
-            std::collections::hash_map::Entry::Occupied(c) => c.get().clone(),
-            std::collections::hash_map::Entry::Vacant(_) => {
-                let conn = rusqlite::Connection::open_in_memory()
-                    .map_err(|e| sqlite::Error::Io(e.to_string()))?;
-                Arc::new(Mutex::new(conn))
-            }
-        };
-        Ok(Self { inner: conn })
+        Err(sqlite::Error::AccessDenied)
+        // let conn = match SQLITE_CONNECTION_POOL
+        //     .get_or_init(Default::default)
+        //     .lock()
+        //     .unwrap()
+        //     .entry(database)
+        // {
+        //     std::collections::hash_map::Entry::Occupied(c) => c.get().clone(),
+        //     std::collections::hash_map::Entry::Vacant(_) => {
+        //         let conn = rusqlite::Connection::open_in_memory()
+        //             .map_err(|e| sqlite::Error::Io(e.to_string()))?;
+        //         Arc::new(Mutex::new(conn))
+        //     }
+        // };
+        // Ok(Self { inner: conn })
     }
 
     fn execute(
@@ -446,64 +447,66 @@ impl SqliteConnection {
         statement: String,
         parameters: Vec<sqlite::Value>,
     ) -> Result<sqlite::QueryResult, sqlite::Error> {
-        let conn = self.inner.lock().unwrap();
-        let mut prepared = conn
-            .prepare(&statement)
-            .map_err(|e| sqlite::Error::Io(e.to_string()))?;
-        let columns = prepared
-            .column_names()
-            .into_iter()
-            .map(String::from)
-            .collect();
-        let mut result = sqlite::QueryResult {
-            columns,
-            rows: vec![],
-        };
-        let params = parameters.into_iter().map(|v| match v {
-            sqlite::Value::Integer(i) => rusqlite::types::Value::Integer(i),
-            sqlite::Value::Real(r) => rusqlite::types::Value::Real(r),
-            sqlite::Value::Text(t) => rusqlite::types::Value::Text(t),
-            sqlite::Value::Blob(b) => rusqlite::types::Value::Blob(b),
-            sqlite::Value::Null => rusqlite::types::Value::Null,
-        });
-        let rows = prepared
-            .query_map(rusqlite::params_from_iter(params), |row| {
-                let mut values = Vec::new();
-                for i in 0..result.columns.len() {
-                    let v = match row.get(i)? {
-                        rusqlite::types::Value::Null => sqlite::Value::Null,
-                        rusqlite::types::Value::Integer(i) => sqlite::Value::Integer(i),
-                        rusqlite::types::Value::Real(f) => sqlite::Value::Real(f),
-                        rusqlite::types::Value::Text(s) => sqlite::Value::Text(s),
-                        rusqlite::types::Value::Blob(b) => sqlite::Value::Blob(b),
-                    };
-                    values.push(v);
-                }
-                Ok(sqlite::RowResult { values })
-            })
-            .map_err(|e| sqlite::Error::Io(e.to_string()))?;
+        Err(sqlite::Error::AccessDenied)
+        //     let conn = self.inner.lock().unwrap();
+        //     let mut prepared = conn
+        //         .prepare(&statement)
+        //         .map_err(|e| sqlite::Error::Io(e.to_string()))?;
+        //     let columns = prepared
+        //         .column_names()
+        //         .into_iter()
+        //         .map(String::from)
+        //         .collect();
+        //     let mut result = sqlite::QueryResult {
+        //         columns,
+        //         rows: vec![],
+        //     };
+        //     let params = parameters.into_iter().map(|v| match v {
+        //         sqlite::Value::Integer(i) => rusqlite::types::Value::Integer(i),
+        //         sqlite::Value::Real(r) => rusqlite::types::Value::Real(r),
+        //         sqlite::Value::Text(t) => rusqlite::types::Value::Text(t),
+        //         sqlite::Value::Blob(b) => rusqlite::types::Value::Blob(b),
+        //         sqlite::Value::Null => rusqlite::types::Value::Null,
+        //     });
+        //     let rows = prepared
+        //         .query_map(rusqlite::params_from_iter(params), |row| {
+        //             let mut values = Vec::new();
+        //             for i in 0..result.columns.len() {
+        //                 let v = match row.get(i)? {
+        //                     rusqlite::types::Value::Null => sqlite::Value::Null,
+        //                     rusqlite::types::Value::Integer(i) => sqlite::Value::Integer(i),
+        //                     rusqlite::types::Value::Real(f) => sqlite::Value::Real(f),
+        //                     rusqlite::types::Value::Text(s) => sqlite::Value::Text(s),
+        //                     rusqlite::types::Value::Blob(b) => sqlite::Value::Blob(b),
+        //                 };
+        //                 values.push(v);
+        //             }
+        //             Ok(sqlite::RowResult { values })
+        //         })
+        //         .map_err(|e| sqlite::Error::Io(e.to_string()))?;
 
-        for row in rows {
-            result
-                .rows
-                .push(row.map_err(|e| sqlite::Error::Io(e.to_string()))?);
-        }
-        Ok(result)
+        //     for row in rows {
+        //         result
+        //             .rows
+        //             .push(row.map_err(|e| sqlite::Error::Io(e.to_string()))?);
+        //     }
+        //     Ok(result)
     }
 }
 
 impl sqlite::GuestConnection for SqliteConnection {
     fn open(database: String) -> Result<sqlite::Connection, sqlite::Error> {
-        let component =
-            manifest::AppManifest::get_component().expect("component id has not been set");
-        let db = component
-            .sqlite_databases
-            .into_iter()
-            .find(|db| db == &database);
-        if db.is_none() {
-            return Err(sqlite::Error::AccessDenied);
-        }
-        Ok(sqlite::Connection::new(SqliteConnection::new(database)?))
+        Err(sqlite::Error::AccessDenied)
+        // let component =
+        //     manifest::AppManifest::get_component().expect("component id has not been set");
+        // let db = component
+        //     .sqlite_databases
+        //     .into_iter()
+        //     .find(|db| db == &database);
+        // if db.is_none() {
+        //     return Err(sqlite::Error::AccessDenied);
+        // }
+        // Ok(sqlite::Connection::new(SqliteConnection::new(database)?))
     }
 
     fn execute(
@@ -537,31 +540,31 @@ impl spin_test_virt::sqlite::GuestConnection for SqliteConnection {
     }
 }
 
-impl std::hash::Hash for sqlite::Value {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            sqlite::Value::Null => 0.hash(state),
-            sqlite::Value::Integer(i) => i.hash(state),
-            sqlite::Value::Real(f) => f.to_bits().hash(state),
-            sqlite::Value::Text(s) => s.hash(state),
-            sqlite::Value::Blob(b) => b.hash(state),
-        }
-    }
-}
+// impl std::hash::Hash for sqlite::Value {
+//     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+//         match self {
+//             sqlite::Value::Null => 0.hash(state),
+//             sqlite::Value::Integer(i) => i.hash(state),
+//             sqlite::Value::Real(f) => f.to_bits().hash(state),
+//             sqlite::Value::Text(s) => s.hash(state),
+//             sqlite::Value::Blob(b) => b.hash(state),
+//         }
+//     }
+// }
 
-impl PartialEq for sqlite::Value {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (sqlite::Value::Null, sqlite::Value::Null) => true,
-            (sqlite::Value::Integer(a), sqlite::Value::Integer(b)) => a == b,
-            (sqlite::Value::Real(a), sqlite::Value::Real(b)) => a == b,
-            (sqlite::Value::Text(a), sqlite::Value::Text(b)) => a == b,
-            (sqlite::Value::Blob(a), sqlite::Value::Blob(b)) => a == b,
-            _ => false,
-        }
-    }
-}
-impl Eq for sqlite::Value {}
+// impl PartialEq for sqlite::Value {
+//     fn eq(&self, other: &Self) -> bool {
+//         match (self, other) {
+//             (sqlite::Value::Null, sqlite::Value::Null) => true,
+//             (sqlite::Value::Integer(a), sqlite::Value::Integer(b)) => a == b,
+//             (sqlite::Value::Real(a), sqlite::Value::Real(b)) => a == b,
+//             (sqlite::Value::Text(a), sqlite::Value::Text(b)) => a == b,
+//             (sqlite::Value::Blob(a), sqlite::Value::Blob(b)) => a == b,
+//             _ => false,
+//         }
+//     }
+// }
+// impl Eq for sqlite::Value {}
 
 impl mysql::Guest for Component {
     type Connection = MySqlConnection;
