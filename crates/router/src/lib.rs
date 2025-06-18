@@ -1,7 +1,7 @@
 #[allow(warnings)]
 mod bindings;
 
-use std::fmt::Display;
+use std::{borrow::Cow, fmt::Display};
 
 use anyhow::Context as _;
 use bindings::{
@@ -11,7 +11,7 @@ use bindings::{
         ErrorCode, Headers, IncomingRequest, OutgoingRequest, ResponseOutparam, Scheme,
     },
 };
-use spin_http::routes::RouteMatch;
+use spin_http::routes::{RouteMatch, Router};
 
 /// Print to the standard output.
 ///
@@ -39,7 +39,20 @@ impl Guest for Component {
             .get("http")
             .and_then(|c| c.get("base").and_then(|v| v.as_str()))
             .unwrap_or("/");
-        let route_match = match find_matching_route(&manifest, &request, base) {
+        let router = router(&manifest, base);
+        let path_with_query = request
+            .path_with_query()
+            .unwrap_or_else(|| String::from("/"));
+        let path = path_with_query
+            .split_once('?')
+            .map(|(path, _)| path)
+            .unwrap_or(&path_with_query);
+        let route_match = router.as_ref().and_then(|r| {
+            r.route(path)
+                .map(RoutingResult::RouteFound)
+                .or(Ok(RoutingResult::RouteNotFound))
+        });
+        let route_match = match route_match {
             Err(e) => {
                 set_error_response(response_out, e);
                 return;
@@ -69,16 +82,16 @@ fn set_error_response(response_out: ResponseOutparam, message: impl Display) {
     );
 }
 
-enum RoutingResult {
-    RouteFound(RouteMatch),
+enum RoutingResult<'router, 'path> {
+    RouteFound(RouteMatch<'router, 'path>),
     RouteNotFound,
 }
 
-fn find_matching_route(
+/// Create a router from the Spin manifest.
+fn router<'a>(
     manifest: &spin_manifest::schema::v2::AppManifest,
-    request: &IncomingRequest,
     base: &str,
-) -> anyhow::Result<RoutingResult> {
+) -> anyhow::Result<Router> {
     let routes = manifest
         .triggers
         .get("http")
@@ -101,19 +114,8 @@ fn find_matching_route(
             )
         })
         .collect::<Vec<_>>();
-    let path_with_query = request
-        .path_with_query()
-        .unwrap_or_else(|| String::from("/"));
-    let path = path_with_query
-        .split_once('?')
-        .map(|(path, _)| path)
-        .unwrap_or(&path_with_query);
-    let (router, _) =
-        spin_http::routes::Router::build(base, routes.iter().map(|(c, t)| (c.as_str(), t)))?;
-    router
-        .route(path)
-        .map(RoutingResult::RouteFound)
-        .or(Ok(RoutingResult::RouteNotFound))
+
+    spin_http::routes::Router::build(base, routes.iter().map(|(c, t)| (c.as_str(), t)), None)
 }
 
 /// Apply any request transformations needed for the given route.
@@ -125,7 +127,10 @@ fn apply_request_transformations(
     let headers_to_add = calculate_default_headers(&request, base, route_match)
         .context("could not calculate default headers for request")?
         .into_iter()
-        .flat_map(|(k, v)| k.into_iter().map(move |s| (s, v.clone().into_bytes())))
+        .flat_map(|(k, v)| {
+            k.into_iter()
+                .map(move |s| (s, v.clone().into_owned().into_bytes()))
+        })
         .chain(request.headers().entries());
     let headers = Headers::new();
     for (key, value) in headers_to_add {
@@ -148,11 +153,11 @@ const RAW_COMPONENT_ROUTE: [&str; 2] = ["SPIN_RAW_COMPONENT_ROUTE", "X_RAW_COMPO
 const BASE_PATH: [&str; 2] = ["SPIN_BASE_PATH", "X_BASE_PATH"];
 const CLIENT_ADDR: [&str; 2] = ["SPIN_CLIENT_ADDR", "X_CLIENT_ADDR"];
 
-fn calculate_default_headers(
+fn calculate_default_headers<'a>(
     req: &IncomingRequest,
-    base: &str,
-    route_match: &RouteMatch,
-) -> anyhow::Result<Vec<([String; 2], String)>> {
+    base: &'a str,
+    route_match: &'a RouteMatch<'_, 'a>,
+) -> anyhow::Result<Vec<([String; 2], Cow<'a, str>)>> {
     fn convert(s: &str) -> String {
         s.to_owned().replace('_', "-").to_ascii_lowercase()
     }
@@ -192,16 +197,16 @@ fn calculate_default_headers(
     let full_url = format!("{}://{}{}", scheme, host, abs_path);
 
     res.push((owned_path_info, path_info));
-    res.push((owned_full_url, full_url));
-    res.push((owned_matched_route, route_match.based_route().to_string()));
+    res.push((owned_full_url, full_url.into()));
+    res.push((owned_matched_route, route_match.based_route().into()));
 
-    res.push((owned_base_path, base.to_string()));
+    res.push((owned_base_path, base.into()));
+    res.push((owned_raw_component_route, route_match.raw_route().into()));
     res.push((
-        owned_raw_component_route,
-        route_match.raw_route().to_string(),
+        owned_component_route,
+        route_match.raw_route_or_prefix().into(),
     ));
-    res.push((owned_component_route, route_match.raw_route_or_prefix()));
-    res.push((owned_client_addr, "127.0.0.1:0".to_owned()));
+    res.push((owned_client_addr, "127.0.0.1:0".into()));
 
     for (wild_name, wild_value) in route_match.named_wildcards() {
         let wild_header = convert(&format!(
@@ -209,7 +214,7 @@ fn calculate_default_headers(
             wild_name.to_ascii_uppercase()
         ));
         let wild_wagi_header = convert(&format!("X_PATH_MATCH_{}", wild_name.to_ascii_uppercase()));
-        res.push(([wild_header, wild_wagi_header], wild_value.clone()));
+        res.push(([wild_header, wild_wagi_header], wild_value.into()));
     }
 
     Ok(res)

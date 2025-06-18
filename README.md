@@ -13,7 +13,7 @@ Before using `spin-test`, make sure you've [installed Spin](https://developer.fe
 To install `spin-test` as a Spin plugin, run the following:
 
 ```
-spin plugin install -u https://github.com/fermyon/spin-test/releases/download/canary/spin-test.json
+spin plugin install -u https://github.com/spinframework/spin-test/releases/download/canary/spin-test.json
 ```
 
 This will install the plugin which can be invoked with `spin test`.
@@ -28,13 +28,13 @@ To install a version of `spin-test` plugin that has been locally built using `ca
 spin pluginify -i
 ```
 
-Note: the [`pluginify`](https://github.com/fermyon/spin-plugins/blob/main/manifests/pluginify/pluginify.json) plugin is a pre-requisite.
+Note: the [`pluginify`](https://github.com/spinframework/spin-plugins/blob/main/manifests/pluginify/pluginify.json) plugin is a pre-requisite.
 
 ### Or install `spin-test` (stand alone)
 
 Alternatively, to install `spin-test` as a stand alone binary, run `cargo build --release` from this directory and ensure that the resulting binary is located on your path.
 
-If you'd rather not build from source, you can find a pre-built binary inside the plugin tarballs included in [any release](https://github.com/fermyon/spin-test/releases). In the latest stable release or in the canary release, find the tarball asset corresponding to the appropriate machine architecture, download the tarball, unarchive it, and retrieve the `test` binary inside it. Place this binary somewhere on your path as `spin-test` and invoke by running `spin-test`.
+If you'd rather not build from source, you can find a pre-built binary inside the plugin tarballs included in [any release](https://github.com/spinframework/spin-test/releases). In the latest stable release or in the canary release, find the tarball asset corresponding to the appropriate machine architecture, download the tarball, unarchive it, and retrieve the `test` binary inside it. Place this binary somewhere on your path as `spin-test` and invoke by running `spin-test`.
 
 ### Create a Spin App
 

@@ -10,9 +10,9 @@ futures = "0.3"
 ipnet = "2.9"
 spin-expressions = { workspace = true }
 spin-manifest = { workspace = true }
-spin-outbound-networking = { workspace = true }
 spin-serde = { workspace = true }
-spin-locked-app = { git = "https://github.com/fermyon/spin", rev = "b86af6c7188e84f5824f7eef757c65ff2ad265c4" }
+spin-locked-app = { git = "https://github.com/spinframework/spin", rev = "165d6fa1bf971fff3f493f98a0bb859fe0b4689b" }
+spin-outbound-networking-config = { git = "https://github.com/spinframework/spin", rev = "165d6fa1bf971fff3f493f98a0bb859fe0b4689b" }
 toml = { workspace = true }
 wit-bindgen-rt = { workspace = true }
 # rusqlite > 0.25 fails to build with various linker errors

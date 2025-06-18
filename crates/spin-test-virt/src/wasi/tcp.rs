@@ -1,5 +1,9 @@
 use core::hash;
 
+use spin_outbound_networking_config::allowed_hosts::{
+    AllowedHostsConfig, HostConfig, IndividualPortConfig, PortConfig,
+};
+
 use crate::bindings::exports::wasi::{self, sockets::network::Ipv4SocketAddress};
 use crate::Component;
 
@@ -44,8 +48,8 @@ impl wasi::sockets::tcp::GuestTcpSocket for TcpSocket {
             .map_err(|e| wasi::sockets::tcp::ErrorCode::PermanentResolverFailure)?;
         let configs = match allowed_hosts {
             // If all hosts are allowed, then we can skip the rest of the checks.
-            spin_outbound_networking::AllowedHostsConfig::All => return Ok(()),
-            spin_outbound_networking::AllowedHostsConfig::SpecificHosts(configs) => configs,
+            AllowedHostsConfig::All => return Ok(()),
+            AllowedHostsConfig::SpecificHosts(configs) => configs,
         };
 
         let (remote_address, remote_port) = match remote_address {
@@ -77,22 +81,18 @@ impl wasi::sockets::tcp::GuestTcpSocket for TcpSocket {
             // Check if the port is allowed.
             let mut allowed_port = false;
             match config.port() {
-                spin_outbound_networking::PortConfig::Any => {
+                PortConfig::Any => {
                     allowed_port = true;
                     break;
                 }
-                spin_outbound_networking::PortConfig::List(l) => {
+                PortConfig::List(l) => {
                     for port in l {
                         match port {
-                            spin_outbound_networking::IndividualPortConfig::Port(p)
-                                if *p == remote_port =>
-                            {
+                            IndividualPortConfig::Port(p) if *p == remote_port => {
                                 allowed_port = true;
                                 break;
                             }
-                            spin_outbound_networking::IndividualPortConfig::Range(r)
-                                if r.contains(&remote_port) =>
-                            {
+                            IndividualPortConfig::Range(r) if r.contains(&remote_port) => {
                                 allowed_port = true;
                                 break;
                             }
@@ -111,10 +111,9 @@ impl wasi::sockets::tcp::GuestTcpSocket for TcpSocket {
             }
 
             match config.host() {
-                spin_outbound_networking::HostConfig::AnySubdomain(_)
-                | spin_outbound_networking::HostConfig::ToSelf => continue,
-                spin_outbound_networking::HostConfig::Any => return Ok(()),
-                spin_outbound_networking::HostConfig::List(hosts) => {
+                HostConfig::AnySubdomain(_) | HostConfig::ToSelf => continue,
+                HostConfig::Any => return Ok(()),
+                HostConfig::List(hosts) => {
                     // Check if any host is a CIDR block that contains the remote address.
                     for host in hosts {
                         // Parse the host as an `IpNet` cidr block and if it fails
@@ -130,9 +129,9 @@ impl wasi::sockets::tcp::GuestTcpSocket for TcpSocket {
                         }
                     }
                 }
-                spin_outbound_networking::HostConfig::Cidr(ip_net) => {
+                HostConfig::Cidr(ip_net) => {
                     // Check if the host is a CIDR block that contains the remote address.
-                    if ip_net.contains(&remote_address) {
+                    if ip_net.contains(remote_address) {
                         return Ok(());
                     }
                 }
