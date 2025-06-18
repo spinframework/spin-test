@@ -36,10 +36,10 @@ members = [
 
 [workspace.dependencies]
 anyhow = "1.0"
-spin-expressions = { git = "https://github.com/fermyon/spin" }
-spin-manifest = { git = "https://github.com/fermyon/spin" }
-spin-outbound-networking = { git = "https://github.com/fermyon/spin" }
-spin-serde = { git = "https://github.com/fermyon/spin" }
+spin-expressions = { git = "https://github.com/fermyon/spin", rev = "b86af6c7188e84f5824f7eef757c65ff2ad265c4" }
+spin-manifest = { git = "https://github.com/fermyon/spin", rev = "b86af6c7188e84f5824f7eef757c65ff2ad265c4" }
+spin-outbound-networking = { git = "https://github.com/fermyon/spin", rev = "b86af6c7188e84f5824f7eef757c65ff2ad265c4" }
+spin-serde = { git = "https://github.com/fermyon/spin", rev = "b86af6c7188e84f5824f7eef757c65ff2ad265c4" }
 toml = { version = "0.8", features = ["preserve_order"] }
 wit-bindgen-rt = { version = "0.26", features = ["bitflags"] }
 wit-component = "0.211"

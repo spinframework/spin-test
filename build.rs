@@ -68,7 +68,7 @@ fn cargo_component_build<'a>(
             "--target",
             match target {
                 Target::Wasm32UnknownUnknown => "wasm32-unknown-unknown",
-                Target::Wasm32Wasi => "wasm32-wasi",
+                Target::Wasm32Wasi => "wasm32-wasip1",
             },
             "--release",
             "--target-dir",
