@@ -34,7 +34,7 @@ impl Runtime {
             let _ = std::fs::write("composition.wasm", composed_component);
         }
         let mut engine_config = wasmtime::Config::new();
-        engine_config.cache_config_load_default()?;
+        engine_config.cache(Some(wasmtime::Cache::new(wasmtime::CacheConfig::new())?));
         let engine = wasmtime::Engine::new(&engine_config)?;
         let store = wasmtime::Store::new(&engine, Data::new(manifest.raw().to_owned()));
 
@@ -42,7 +42,7 @@ impl Runtime {
             .context("composed component was an invalid Wasm component")?;
 
         let mut linker = wasmtime::component::Linker::<Data>::new(&engine);
-        wasmtime_wasi::add_to_linker_sync(&mut linker).context("failed to link to wasi")?;
+        wasmtime_wasi::p2::add_to_linker_sync(&mut linker).context("failed to link to wasi")?;
         non_dynamic::Runner::add_to_linker(&mut linker, |x| x)
             .context("failed to link to test runner world")?;
 
@@ -74,7 +74,7 @@ impl Runtime {
                     .context(format!("test '{test_name}' failed "))
             }
             TestInvocation::RunArgument(test_name) => {
-                let (runner, _) = non_dynamic::Runner::instantiate(
+                let runner = non_dynamic::Runner::instantiate(
                     &mut self.store,
                     &self.component,
                     &self.linker,
@@ -179,14 +179,14 @@ pub enum TestInvocation {
 /// Store specific data
 struct Data {
     table: wasmtime_wasi::ResourceTable,
-    ctx: wasmtime_wasi::WasiCtx,
+    ctx: wasmtime_wasi::p2::WasiCtx,
     manifest: String,
 }
 
 impl Data {
     fn new(manifest: String) -> Self {
         let table = wasmtime_wasi::ResourceTable::new();
-        let ctx = wasmtime_wasi::WasiCtxBuilder::new()
+        let ctx = wasmtime_wasi::p2::WasiCtxBuilder::new()
             .inherit_stdout()
             .inherit_stderr()
             .inherit_env()
@@ -204,13 +204,14 @@ impl non_dynamic::RunnerImports for Data {
         self.manifest.clone()
     }
 }
-
-impl wasmtime_wasi::WasiView for Data {
+impl wasmtime_wasi::p2::IoView for Data {
     fn table(&mut self) -> &mut wasmtime_wasi::ResourceTable {
         &mut self.table
     }
+}
 
-    fn ctx(&mut self) -> &mut wasmtime_wasi::WasiCtx {
+impl wasmtime_wasi::p2::WasiView for Data {
+    fn ctx(&mut self) -> &mut wasmtime_wasi::p2::WasiCtx {
         &mut self.ctx
     }
 }

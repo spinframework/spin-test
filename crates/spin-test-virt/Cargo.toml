@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0"
+anyhow = { workspace = true }
 async-trait = "0.1"
 futures = "0.3"
-ipnet = "2.9"
+ipnet = "2.11"
 spin-expressions = { workspace = true }
 spin-manifest = { workspace = true }
 spin-serde = { workspace = true }

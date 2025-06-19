@@ -16,8 +16,8 @@ mod bindings {
         world: "virtualized-app",
         path: "../host-wit",
         with: {
-            "wasi:io": wasmtime_wasi::bindings::io,
-            "wasi:clocks": wasmtime_wasi::bindings::clocks,
+            "wasi:io": wasmtime_wasi::p2::bindings::io,
+            "wasi:clocks": wasmtime_wasi::p2::bindings::clocks,
         }
     });
 }
@@ -33,7 +33,7 @@ pub(crate) struct SpinTest {
 impl SpinTest {
     pub fn new(manifest: String, component_path: PathBuf) -> anyhow::Result<Self> {
         let mut engine_config = wasmtime::Config::new();
-        engine_config.cache_config_load_default()?;
+        engine_config.cache(Some(wasmtime::Cache::new(wasmtime::CacheConfig::new())?));
         let engine = wasmtime::Engine::new(&engine_config)?;
 
         let mut store = wasmtime::Store::new(&engine, super::StoreData::new(manifest));
@@ -42,10 +42,10 @@ impl SpinTest {
         let component = spin_test::virtualize_app(component).context("failed to virtualize app")?;
 
         let component = wasmtime::component::Component::new(&engine, component)?;
-        wasmtime_wasi::add_to_linker_sync(&mut linker)?;
+        wasmtime_wasi::p2::add_to_linker_sync(&mut linker)?;
         bindings::VirtualizedApp::add_to_linker(&mut linker, |x| x)?;
 
-        let (instance, _) = bindings::VirtualizedApp::instantiate(&mut store, &component, &linker)?;
+        let instance = bindings::VirtualizedApp::instantiate(&mut store, &component, &linker)?;
 
         Ok(Self { instance, store })
     }
