@@ -11,7 +11,7 @@ use bindings::{
         ErrorCode, Headers, IncomingRequest, OutgoingRequest, ResponseOutparam, Scheme,
     },
 };
-use spin_http::routes::{RouteMatch, Router};
+use spin_routes::{RouteMatch, Router};
 
 /// Print to the standard output.
 ///
@@ -115,7 +115,7 @@ fn router<'a>(
         })
         .collect::<Vec<_>>();
 
-    spin_http::routes::Router::build(base, routes.iter().map(|(c, t)| (c.as_str(), t)), None)
+    spin_routes::Router::build(base, routes.iter().map(|(c, t)| (c.as_str(), t)), None)
 }
 
 /// Apply any request transformations needed for the given route.

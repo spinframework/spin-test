@@ -13,9 +13,9 @@ hyper = "1.0"
 libtest-mimic = "0.7"
 log = "0.4"
 owo-colors = { version = "4.0.0", features = ["supports-colors"] }
-spin-common = { git = "https://github.com/spinframework/spin", rev = "78c77f34541f0a7fbfc897e113f64318548e2494" }
-spin-componentize = { git = "https://github.com/spinframework/spin", rev = "78c77f34541f0a7fbfc897e113f64318548e2494" }
-spin-http = { git = "https://github.com/spinframework/spin", default-features = false, rev = "78c77f34541f0a7fbfc897e113f64318548e2494" }
+spin-common = { git = "https://github.com/spinframework/spin", rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
+spin-componentize = { git = "https://github.com/spinframework/spin", rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
+spin-http = { git = "https://github.com/spinframework/spin", default-features = false, rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
 spin-manifest = { workspace = true }
 temp-dir = "0.1.13"
 tokio = "1.0"
@@ -36,10 +36,10 @@ members = [
 
 [workspace.dependencies]
 anyhow = "1.0"
-spin-expressions = { git = "https://github.com/spinframework/spin", rev = "78c77f34541f0a7fbfc897e113f64318548e2494" }
-spin-manifest = { git = "https://github.com/spinframework/spin", rev = "78c77f34541f0a7fbfc897e113f64318548e2494" }
-spin-factor-outbound-networking = { git = "https://github.com/spinframework/spin", rev = "78c77f34541f0a7fbfc897e113f64318548e2494" }
-spin-serde = { git = "https://github.com/spinframework/spin", rev = "78c77f34541f0a7fbfc897e113f64318548e2494" }
+spin-expressions = { git = "https://github.com/spinframework/spin", rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
+spin-manifest = { git = "https://github.com/spinframework/spin", rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
+spin-factor-outbound-networking = { git = "https://github.com/spinframework/spin", rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
+spin-serde = { git = "https://github.com/spinframework/spin", rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
 toml = { version = "0.8", features = ["preserve_order"] }
 wit-bindgen-rt = { version = "0.26", features = ["bitflags"] }
 wit-component = "0.211"
