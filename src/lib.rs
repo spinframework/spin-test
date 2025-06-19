@@ -103,11 +103,11 @@ pub fn virtualize_app(app_component: Component) -> anyhow::Result<Vec<u8>> {
     };
     export("fermyon:spin-wasi-virt/http-helper");
     export("fermyon:spin-wasi-virt/http-handler");
-    export("wasi:http/types@0.2.0");
-    export("wasi:clocks/monotonic-clock@0.2.0");
-    export("wasi:io/streams@0.2.0");
-    export("wasi:io/error@0.2.0");
-    export("wasi:io/poll@0.2.0");
+    export("wasi:http/types@0.2.3");
+    export("wasi:clocks/monotonic-clock@0.2.3");
+    export("wasi:io/streams@0.2.3");
+    export("wasi:io/error@0.2.3");
+    export("wasi:io/poll@0.2.3");
 
     // Instantiate the `app` component with various exports from the virt instance
     let app = instantiate_app(&composition, app_component, &virt)?;
@@ -116,12 +116,12 @@ pub fn virtualize_app(app_component: Component) -> anyhow::Result<Vec<u8>> {
     let router = instantiate_router(&composition, &virt, app)?;
 
     let export = router
-        .export("wasi:http/incoming-handler@0.2.0")
-        .context("failed to export 'wasi:http/incoming-handler@0.2.0' from router")?
-        .context("router must export 'wasi:http/incoming-handler@0.2.0' but it did not")?;
+        .export("wasi:http/incoming-handler@0.2.3")
+        .context("failed to export 'wasi:http/incoming-handler@0.2.3' from router")?
+        .context("router must export 'wasi:http/incoming-handler@0.2.3' but it did not")?;
 
     composition
-        .export(export, "wasi:http/incoming-handler@0.2.0")
+        .export(export, "wasi:http/incoming-handler@0.2.3")
         .unwrap();
 
     composition
@@ -137,8 +137,8 @@ fn instantiate_test(
 ) -> Result<composition::Instance, anyhow::Error> {
     // Get args from `router` and `virt` instances
     let router_args = [Ok((
-        "wasi:http/incoming-handler@0.2.0",
-        export_item(&router, "wasi:http/incoming-handler@0.2.0")?,
+        "wasi:http/incoming-handler@0.2.3",
+        export_item(&router, "wasi:http/incoming-handler@0.2.3")?,
     ))]
     .into_iter();
     let virt_args = [
@@ -148,18 +148,18 @@ fn instantiate_test(
         "fermyon:spin-test-virt/key-value",
         "fermyon:spin-test-virt/variables",
         "fermyon:spin/key-value@2.0.0",
-        "wasi:io/error@0.2.0",
-        "wasi:io/streams@0.2.0",
-        "wasi:io/poll@0.2.0",
-        "wasi:clocks/monotonic-clock@0.2.0",
-        "wasi:clocks/wall-clock@0.2.0",
-        "wasi:filesystem/types@0.2.0",
-        "wasi:filesystem/preopens@0.2.0",
-        "wasi:cli/stdin@0.2.0",
-        "wasi:cli/stderr@0.2.0",
-        "wasi:cli/stdout@0.2.0",
-        "wasi:http/types@0.2.0",
-        "wasi:http/outgoing-handler@0.2.0",
+        "wasi:io/error@0.2.3",
+        "wasi:io/streams@0.2.3",
+        "wasi:io/poll@0.2.3",
+        "wasi:clocks/monotonic-clock@0.2.3",
+        "wasi:clocks/wall-clock@0.2.3",
+        "wasi:filesystem/types@0.2.3",
+        "wasi:filesystem/preopens@0.2.3",
+        "wasi:cli/stdin@0.2.3",
+        "wasi:cli/stderr@0.2.3",
+        "wasi:cli/stdout@0.2.3",
+        "wasi:http/types@0.2.3",
+        "wasi:http/outgoing-handler@0.2.3",
     ]
     .into_iter()
     .map(|k| Ok((k, export_item(&virt, k)?)))
@@ -191,17 +191,17 @@ fn instantiate_router(
     app: composition::Instance,
 ) -> anyhow::Result<composition::Instance> {
     // Get access to the `http/types` and `http-helper` exports
-    let http_types = export_instance(virt, "wasi:http/types@0.2.0")?;
+    let http_types = export_instance(virt, "wasi:http/types@0.2.3")?;
     let http_helper = export_instance(virt, "fermyon:spin-wasi-virt/http-helper")?;
 
     let router_args = [
-        ("wasi:http/types@0.2.0", virt),
-        ("wasi:io/error@0.2.0", virt),
-        ("wasi:io/streams@0.2.0", virt),
-        ("wasi:io/poll@0.2.0", virt),
-        ("wasi:cli/stdout@0.2.0", virt),
+        ("wasi:http/types@0.2.3", virt),
+        ("wasi:io/error@0.2.3", virt),
+        ("wasi:io/streams@0.2.3", virt),
+        ("wasi:io/poll@0.2.3", virt),
+        ("wasi:cli/stdout@0.2.3", virt),
         ("set-component-id", virt),
-        ("wasi:http/incoming-handler@0.2.0", &app),
+        ("wasi:http/incoming-handler@0.2.3", &app),
         ("outgoing-request", &http_types),
         ("incoming-request", &http_types),
         ("incoming-body", &http_types),
@@ -235,37 +235,37 @@ fn instantiate_app(
         "fermyon:spin/sqlite@2.0.0",
         "fermyon:spin/mqtt@2.0.0",
         "fermyon:spin/variables@2.0.0",
-        "wasi:io/error@0.2.0",
-        "wasi:io/streams@0.2.0",
-        "wasi:io/poll@0.2.0",
-        "wasi:clocks/monotonic-clock@0.2.0",
-        "wasi:clocks/wall-clock@0.2.0",
-        "wasi:random/random@0.2.0",
-        "wasi:random/insecure@0.2.0",
-        "wasi:random/insecure-seed@0.2.0",
-        "wasi:cli/terminal-input@0.2.0",
-        "wasi:cli/terminal-output@0.2.0",
-        "wasi:cli/terminal-stdin@0.2.0",
-        "wasi:cli/terminal-stdout@0.2.0",
-        "wasi:cli/terminal-stderr@0.2.0",
-        "wasi:cli/environment@0.2.0",
-        "wasi:cli/exit@0.2.0",
-        "wasi:cli/environment@0.2.0",
-        "wasi:cli/exit@0.2.0",
-        "wasi:cli/stdin@0.2.0",
-        "wasi:cli/stderr@0.2.0",
-        "wasi:cli/stdout@0.2.0",
-        "wasi:filesystem/types@0.2.0",
-        "wasi:filesystem/preopens@0.2.0",
-        "wasi:sockets/instance-network@0.2.0",
-        "wasi:sockets/network@0.2.0",
-        "wasi:sockets/udp@0.2.0",
-        "wasi:sockets/udp-create-socket@0.2.0",
-        "wasi:sockets/tcp@0.2.0",
-        "wasi:sockets/tcp-create-socket@0.2.0",
-        "wasi:sockets/ip-name-lookup@0.2.0",
-        "wasi:http/outgoing-handler@0.2.0",
-        "wasi:http/types@0.2.0",
+        "wasi:io/error@0.2.3",
+        "wasi:io/streams@0.2.3",
+        "wasi:io/poll@0.2.3",
+        "wasi:clocks/monotonic-clock@0.2.3",
+        "wasi:clocks/wall-clock@0.2.3",
+        "wasi:random/random@0.2.3",
+        "wasi:random/insecure@0.2.3",
+        "wasi:random/insecure-seed@0.2.3",
+        "wasi:cli/terminal-input@0.2.3",
+        "wasi:cli/terminal-output@0.2.3",
+        "wasi:cli/terminal-stdin@0.2.3",
+        "wasi:cli/terminal-stdout@0.2.3",
+        "wasi:cli/terminal-stderr@0.2.3",
+        "wasi:cli/environment@0.2.3",
+        "wasi:cli/exit@0.2.3",
+        "wasi:cli/environment@0.2.3",
+        "wasi:cli/exit@0.2.3",
+        "wasi:cli/stdin@0.2.3",
+        "wasi:cli/stderr@0.2.3",
+        "wasi:cli/stdout@0.2.3",
+        "wasi:filesystem/types@0.2.3",
+        "wasi:filesystem/preopens@0.2.3",
+        "wasi:sockets/instance-network@0.2.3",
+        "wasi:sockets/network@0.2.3",
+        "wasi:sockets/udp@0.2.3",
+        "wasi:sockets/udp-create-socket@0.2.3",
+        "wasi:sockets/tcp@0.2.3",
+        "wasi:sockets/tcp-create-socket@0.2.3",
+        "wasi:sockets/ip-name-lookup@0.2.3",
+        "wasi:http/outgoing-handler@0.2.3",
+        "wasi:http/types@0.2.3",
     ]
     .into_iter()
     .map(|k| Ok((k, export_item(virt, k)?)))

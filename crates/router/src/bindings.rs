@@ -92,7 +92,7 @@ pub mod wasi {
             pub fn get_stdout() -> OutputStream {
                 unsafe {
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:cli/stdout@0.2.0")]
+                    #[link(wasm_import_module = "wasi:cli/stdout@0.2.3")]
                     unsafe extern "C" {
                         #[link_name = "get-stdout"]
                         fn wit_import0() -> i32;
@@ -120,8 +120,6 @@ pub mod wasi {
         ///
         /// A monotonic clock is a clock which has an unspecified initial value, and
         /// successive reads of the clock will produce non-decreasing values.
-        ///
-        /// It is intended for measuring elapsed time.
         #[allow(dead_code, async_fn_in_trait, unused_imports, clippy::all)]
         pub mod monotonic_clock {
             #[used]
@@ -143,7 +141,7 @@ pub mod wasi {
             pub fn now() -> Instant {
                 unsafe {
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:clocks/monotonic-clock@0.2.0")]
+                    #[link(wasm_import_module = "wasi:clocks/monotonic-clock@0.2.3")]
                     unsafe extern "C" {
                         #[link_name = "now"]
                         fn wit_import0() -> i64;
@@ -162,7 +160,7 @@ pub mod wasi {
             pub fn resolution() -> Duration {
                 unsafe {
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:clocks/monotonic-clock@0.2.0")]
+                    #[link(wasm_import_module = "wasi:clocks/monotonic-clock@0.2.3")]
                     unsafe extern "C" {
                         #[link_name = "resolution"]
                         fn wit_import0() -> i64;
@@ -177,11 +175,11 @@ pub mod wasi {
             }
             #[allow(unused_unsafe, clippy::all)]
             /// Create a `pollable` which will resolve once the specified instant
-            /// occured.
+            /// has occurred.
             pub fn subscribe_instant(when: Instant) -> Pollable {
                 unsafe {
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:clocks/monotonic-clock@0.2.0")]
+                    #[link(wasm_import_module = "wasi:clocks/monotonic-clock@0.2.3")]
                     unsafe extern "C" {
                         #[link_name = "subscribe-instant"]
                         fn wit_import0(_: i64) -> i32;
@@ -199,13 +197,12 @@ pub mod wasi {
                 }
             }
             #[allow(unused_unsafe, clippy::all)]
-            /// Create a `pollable` which will resolve once the given duration has
-            /// elapsed, starting at the time at which this function was called.
-            /// occured.
+            /// Create a `pollable` that will resolve after the specified duration has
+            /// elapsed from the time this function is invoked.
             pub fn subscribe_duration(when: Duration) -> Pollable {
                 unsafe {
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:clocks/monotonic-clock@0.2.0")]
+                    #[link(wasm_import_module = "wasi:clocks/monotonic-clock@0.2.3")]
                     unsafe extern "C" {
                         #[link_name = "subscribe-duration"]
                         fn wit_import0(_: i64) -> i32;
@@ -347,7 +344,7 @@ pub mod wasi {
                 }
             }
             /// These cases are inspired by the IANA HTTP Proxy Error Types:
-            ///   https://www.iana.org/assignments/http-proxy-status/http-proxy-status.xhtml#table-http-proxy-error-types
+            ///   <https://www.iana.org/assignments/http-proxy-status/http-proxy-status.xhtml#table-http-proxy-error-types>
             #[derive(Clone)]
             pub enum ErrorCode {
                 DnsTimeout,
@@ -561,11 +558,11 @@ pub mod wasi {
             /// setting or appending to a `fields` resource.
             #[derive(Clone, Copy)]
             pub enum HeaderError {
-                /// This error indicates that a `field-key` or `field-value` was
+                /// This error indicates that a `field-name` or `field-value` was
                 /// syntactically invalid when used with an operation that sets headers in a
                 /// `fields`.
                 InvalidSyntax,
-                /// This error indicates that a forbidden `field-key` was used when trying
+                /// This error indicates that a forbidden `field-name` was used when trying
                 /// to set a header in a `fields`.
                 Forbidden,
                 /// This error indicates that the operation on the `fields` was not
@@ -600,7 +597,19 @@ pub mod wasi {
             }
             impl std::error::Error for HeaderError {}
             /// Field keys are always strings.
+            ///
+            /// Field keys should always be treated as case insensitive by the `fields`
+            /// resource for the purposes of equality checking.
+            ///
+            /// # Deprecation
+            ///
+            /// This type has been deprecated in favor of the `field-name` type.
             pub type FieldKey = _rt::String;
+            /// Field names are always strings.
+            ///
+            /// Field names should always be treated as case insensitive by the `fields`
+            /// resource for the purposes of equality checking.
+            pub type FieldName = FieldKey;
             /// Field values should always be ASCII strings. However, in
             /// reality, HTTP implementations often have to interpret malformed values,
             /// so they are provided as a list of bytes.
@@ -643,7 +652,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]fields"]
                             fn drop(_: u32);
@@ -685,7 +694,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]incoming-request"]
                             fn drop(_: u32);
@@ -723,7 +732,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]outgoing-request"]
                             fn drop(_: u32);
@@ -766,7 +775,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]request-options"]
                             fn drop(_: u32);
@@ -808,7 +817,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]response-outparam"]
                             fn drop(_: u32);
@@ -848,7 +857,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]incoming-response"]
                             fn drop(_: u32);
@@ -893,7 +902,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]incoming-body"]
                             fn drop(_: u32);
@@ -902,7 +911,7 @@ pub mod wasi {
                     }
                 }
             }
-            /// Represents a future which may eventaully return trailers, or an error.
+            /// Represents a future which may eventually return trailers, or an error.
             ///
             /// In the case that the incoming HTTP Request or Response did not have any
             /// trailers, this future will resolve to the empty set of trailers once the
@@ -935,7 +944,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]future-trailers"]
                             fn drop(_: u32);
@@ -973,7 +982,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]outgoing-response"]
                             fn drop(_: u32);
@@ -994,7 +1003,7 @@ pub mod wasi {
             ///
             /// If the user code drops this resource, as opposed to calling the static
             /// method `finish`, the implementation should treat the body as incomplete,
-            /// and that an error has occured. The implementation should propogate this
+            /// and that an error has occurred. The implementation should propagate this
             /// error to the HTTP protocol by whatever means it has available,
             /// including: corrupting the body on the wire, aborting the associated
             /// Request, or sending a late status code for the Response.
@@ -1026,7 +1035,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]outgoing-body"]
                             fn drop(_: u32);
@@ -1035,7 +1044,7 @@ pub mod wasi {
                     }
                 }
             }
-            /// Represents a future which may eventaully return an incoming HTTP
+            /// Represents a future which may eventually return an incoming HTTP
             /// Response, or an error.
             ///
             /// This resource is returned by the `wasi:http/outgoing-handler` interface to
@@ -1068,7 +1077,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]future-incoming-response"]
                             fn drop(_: u32);
@@ -1103,7 +1112,7 @@ pub mod wasi {
                     );
                     let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                    #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                     unsafe extern "C" {
                         #[link_name = "http-error-code"]
                         fn wit_import1(_: i32, _: *mut u8);
@@ -1651,7 +1660,7 @@ pub mod wasi {
                 pub fn new() -> Self {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[constructor]fields"]
                             fn wit_import0() -> i32;
@@ -1671,19 +1680,17 @@ pub mod wasi {
                 ///
                 /// The resulting `fields` is mutable.
                 ///
-                /// The list represents each key-value pair in the Fields. Keys
+                /// The list represents each name-value pair in the Fields. Names
                 /// which have multiple values are represented by multiple entries in this
-                /// list with the same key.
+                /// list with the same name.
                 ///
-                /// The tuple is a pair of the field key, represented as a string, and
-                /// Value, represented as a list of bytes. In a valid Fields, all keys
-                /// and values are valid UTF-8 strings. However, values are not always
-                /// well-formed, so they are represented as a raw list of bytes.
+                /// The tuple is a pair of the field name, represented as a string, and
+                /// Value, represented as a list of bytes.
                 ///
-                /// An error result will be returned if any header or value was
-                /// syntactically invalid, or if a header was forbidden.
+                /// An error result will be returned if any `field-name` or `field-value` is
+                /// syntactically invalid, or if a field is forbidden.
                 pub fn from_list(
-                    entries: &[(FieldKey, FieldValue)],
+                    entries: &[(FieldName, FieldValue)],
                 ) -> Result<Fields, HeaderError> {
                     unsafe {
                         #[repr(align(4))]
@@ -1731,7 +1738,7 @@ pub mod wasi {
                         }
                         let ptr4 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[static]fields.from-list"]
                             fn wit_import5(_: *mut u8, _: usize, _: *mut u8);
@@ -1780,10 +1787,10 @@ pub mod wasi {
             }
             impl Fields {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Get all of the values corresponding to a key. If the key is not present
-                /// in this `fields`, an empty list is returned. However, if the key is
-                /// present but empty, this is represented by a list with one or more
-                /// empty field-values present.
+                /// Get all of the values corresponding to a name. If the name is not present
+                /// in this `fields` or is syntactically invalid, an empty list is returned.
+                /// However, if the name is present but empty, this is represented by a list
+                /// with one or more empty field-values present.
                 pub fn get(&self, name: &str) -> _rt::Vec<FieldValue> {
                     unsafe {
                         #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
@@ -1802,7 +1809,7 @@ pub mod wasi {
                         let len0 = vec0.len();
                         let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]fields.get"]
                             fn wit_import2(_: i32, _: *mut u8, _: usize, _: *mut u8);
@@ -1856,7 +1863,7 @@ pub mod wasi {
             }
             impl Fields {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Returns `true` when the key is present in this `fields`. If the key is
+                /// Returns `true` when the name is present in this `fields`. If the name is
                 /// syntactically invalid, `false` is returned.
                 pub fn has(&self, name: &str) -> bool {
                     unsafe {
@@ -1864,7 +1871,7 @@ pub mod wasi {
                         let ptr0 = vec0.as_ptr().cast::<u8>();
                         let len0 = vec0.len();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]fields.has"]
                             fn wit_import1(_: i32, _: *mut u8, _: usize) -> i32;
@@ -1886,10 +1893,13 @@ pub mod wasi {
             }
             impl Fields {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Set all of the values for a key. Clears any existing values for that
-                /// key, if they have been set.
+                /// Set all of the values for a name. Clears any existing values for that
+                /// name, if they have been set.
                 ///
                 /// Fails with `header-error.immutable` if the `fields` are immutable.
+                ///
+                /// Fails with `header-error.invalid-syntax` if the `field-name` or any of
+                /// the `field-value`s are syntactically invalid.
                 pub fn set(
                     &self,
                     name: &str,
@@ -1934,7 +1944,7 @@ pub mod wasi {
                         }
                         let ptr3 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]fields.set"]
                             fn wit_import4(
@@ -1999,10 +2009,13 @@ pub mod wasi {
             }
             impl Fields {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Delete all values for a key. Does nothing if no values for the key
+                /// Delete all values for a name. Does nothing if no values for the name
                 /// exist.
                 ///
                 /// Fails with `header-error.immutable` if the `fields` are immutable.
+                ///
+                /// Fails with `header-error.invalid-syntax` if the `field-name` is
+                /// syntactically invalid.
                 pub fn delete(&self, name: &str) -> Result<(), HeaderError> {
                     unsafe {
                         #[repr(align(1))]
@@ -2015,7 +2028,7 @@ pub mod wasi {
                         let len0 = vec0.len();
                         let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]fields.delete"]
                             fn wit_import2(_: i32, _: *mut u8, _: usize, _: *mut u8);
@@ -2066,10 +2079,13 @@ pub mod wasi {
             }
             impl Fields {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Append a value for a key. Does not change or delete any existing
-                /// values for that key.
+                /// Append a value for a name. Does not change or delete any existing
+                /// values for that name.
                 ///
                 /// Fails with `header-error.immutable` if the `fields` are immutable.
+                ///
+                /// Fails with `header-error.invalid-syntax` if the `field-name` or
+                /// `field-value` are syntactically invalid.
                 pub fn append(
                     &self,
                     name: &str,
@@ -2089,7 +2105,7 @@ pub mod wasi {
                         let len1 = vec1.len();
                         let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]fields.append"]
                             fn wit_import3(
@@ -2151,13 +2167,16 @@ pub mod wasi {
             }
             impl Fields {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Retrieve the full set of keys and values in the Fields. Like the
-                /// constructor, the list represents each key-value pair.
+                /// Retrieve the full set of names and values in the Fields. Like the
+                /// constructor, the list represents each name-value pair.
                 ///
-                /// The outer list represents each key-value pair in the Fields. Keys
+                /// The outer list represents each name-value pair in the Fields. Names
                 /// which have multiple values are represented by multiple entries in this
-                /// list with the same key.
-                pub fn entries(&self) -> _rt::Vec<(FieldKey, FieldValue)> {
+                /// list with the same name.
+                ///
+                /// The names and values are always returned in the original casing and in
+                /// the order in which they will be serialized for transport.
+                pub fn entries(&self) -> _rt::Vec<(FieldName, FieldValue)> {
                     unsafe {
                         #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
                         #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
@@ -2172,7 +2191,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]fields.entries"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2229,13 +2248,13 @@ pub mod wasi {
             }
             impl Fields {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Make a deep copy of the Fields. Equivelant in behavior to calling the
+                /// Make a deep copy of the Fields. Equivalent in behavior to calling the
                 /// `fields` constructor on the return value of `entries`. The resulting
                 /// `fields` is mutable.
                 pub fn clone(&self) -> Fields {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]fields.clone"]
                             fn wit_import0(_: i32) -> i32;
@@ -2267,7 +2286,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-request.method"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2331,7 +2350,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-request.path-with-query"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2386,7 +2405,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-request.scheme"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2439,7 +2458,7 @@ pub mod wasi {
             }
             impl IncomingRequest {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Returns the authority from the request, if it was present.
+                /// Returns the authority of the Request's target URI, if present.
                 pub fn authority(&self) -> Option<_rt::String> {
                     unsafe {
                         #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
@@ -2455,7 +2474,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-request.authority"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2505,7 +2524,7 @@ pub mod wasi {
                 pub fn headers(&self) -> Headers {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-request.headers"]
                             fn wit_import0(_: i32) -> i32;
@@ -2532,7 +2551,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-request.consume"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2576,7 +2595,7 @@ pub mod wasi {
                 pub fn new(headers: Headers) -> Self {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[constructor]outgoing-request"]
                             fn wit_import0(_: i32) -> i32;
@@ -2609,7 +2628,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.body"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2656,7 +2675,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.method"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2726,7 +2745,7 @@ pub mod wasi {
                             }
                         };
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.set-method"]
                             fn wit_import2(_: i32, _: i32, _: *mut u8, _: usize) -> i32;
@@ -2781,7 +2800,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.path-with-query"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2838,7 +2857,7 @@ pub mod wasi {
                             None => (0i32, ::core::ptr::null_mut(), 0usize),
                         };
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.set-path-with-query"]
                             fn wit_import2(_: i32, _: i32, _: *mut u8, _: usize) -> i32;
@@ -2893,7 +2912,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.scheme"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -2968,7 +2987,7 @@ pub mod wasi {
                             None => (0i32, 0i32, ::core::ptr::null_mut(), 0usize),
                         };
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.set-scheme"]
                             fn wit_import3(
@@ -3014,8 +3033,8 @@ pub mod wasi {
             }
             impl OutgoingRequest {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Get the HTTP Authority for the Request. A value of `none` may be used
-                /// with Related Schemes which do not require an Authority. The HTTP and
+                /// Get the authority of the Request's target URI. A value of `none` may be used
+                /// with Related Schemes which do not require an authority. The HTTP and
                 /// HTTPS schemes always require an authority.
                 pub fn authority(&self) -> Option<_rt::String> {
                     unsafe {
@@ -3032,7 +3051,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.authority"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -3071,10 +3090,10 @@ pub mod wasi {
             }
             impl OutgoingRequest {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Set the HTTP Authority for the Request. A value of `none` may be used
-                /// with Related Schemes which do not require an Authority. The HTTP and
+                /// Set the authority of the Request's target URI. A value of `none` may be used
+                /// with Related Schemes which do not require an authority. The HTTP and
                 /// HTTPS schemes always require an authority. Fails if the string given is
-                /// not a syntactically valid uri authority.
+                /// not a syntactically valid URI authority.
                 pub fn set_authority(&self, authority: Option<&str>) -> Result<(), ()> {
                     unsafe {
                         let (result1_0, result1_1, result1_2) = match authority {
@@ -3087,7 +3106,7 @@ pub mod wasi {
                             None => (0i32, ::core::ptr::null_mut(), 0usize),
                         };
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.set-authority"]
                             fn wit_import2(_: i32, _: i32, _: *mut u8, _: usize) -> i32;
@@ -3131,12 +3150,12 @@ pub mod wasi {
                 /// `delete` operations will fail with `header-error.immutable`.
                 ///
                 /// This headers resource is a child: it must be dropped before the parent
-                /// `outgoing-request` is dropped, or its ownership is transfered to
+                /// `outgoing-request` is dropped, or its ownership is transferred to
                 /// another component by e.g. `outgoing-handler.handle`.
                 pub fn headers(&self) -> Headers {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-request.headers"]
                             fn wit_import0(_: i32) -> i32;
@@ -3156,7 +3175,7 @@ pub mod wasi {
                 pub fn new() -> Self {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[constructor]request-options"]
                             fn wit_import0() -> i32;
@@ -3182,7 +3201,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]request-options.connect-timeout"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -3222,7 +3241,7 @@ pub mod wasi {
                             None => (0i32, 0i64),
                         };
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]request-options.set-connect-timeout"]
                             fn wit_import1(_: i32, _: i32, _: i64) -> i32;
@@ -3260,7 +3279,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]request-options.first-byte-timeout"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -3300,7 +3319,7 @@ pub mod wasi {
                             None => (0i32, 0i64),
                         };
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]request-options.set-first-byte-timeout"]
                             fn wit_import1(_: i32, _: i32, _: i64) -> i32;
@@ -3339,7 +3358,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]request-options.between-bytes-timeout"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -3380,7 +3399,7 @@ pub mod wasi {
                             None => (0i32, 0i64),
                         };
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]request-options.set-between-bytes-timeout"]
                             fn wit_import1(_: i32, _: i32, _: i64) -> i32;
@@ -4100,7 +4119,7 @@ pub mod wasi {
                             }
                         };
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[static]response-outparam.set"]
                             fn wit_import39(
@@ -4151,7 +4170,7 @@ pub mod wasi {
                 pub fn status(&self) -> StatusCode {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-response.status"]
                             fn wit_import0(_: i32) -> i32;
@@ -4177,7 +4196,7 @@ pub mod wasi {
                 pub fn headers(&self) -> Headers {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-response.headers"]
                             fn wit_import0(_: i32) -> i32;
@@ -4204,7 +4223,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-response.consume"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -4259,7 +4278,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]incoming-body.stream"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -4299,7 +4318,7 @@ pub mod wasi {
                 pub fn finish(this: IncomingBody) -> FutureTrailers {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[static]incoming-body.finish"]
                             fn wit_import0(_: i32) -> i32;
@@ -4316,12 +4335,12 @@ pub mod wasi {
             impl FutureTrailers {
                 #[allow(unused_unsafe, clippy::all)]
                 /// Returns a pollable which becomes ready when either the trailers have
-                /// been received, or an error has occured. When this pollable is ready,
+                /// been received, or an error has occurred. When this pollable is ready,
                 /// the `get` method will return `some`.
                 pub fn subscribe(&self) -> Pollable {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]future-trailers.subscribe"]
                             fn wit_import0(_: i32) -> i32;
@@ -4341,7 +4360,7 @@ pub mod wasi {
             }
             impl FutureTrailers {
                 #[allow(unused_unsafe, clippy::all)]
-                /// Returns the contents of the trailers, or an error which occured,
+                /// Returns the contents of the trailers, or an error which occurred,
                 /// once the future is ready.
                 ///
                 /// The outer `option` represents future readiness. Users can wait on this
@@ -4353,7 +4372,7 @@ pub mod wasi {
                 ///
                 /// The inner `result` represents that either the HTTP Request or Response
                 /// body, as well as any trailers, were received successfully, or that an
-                /// error occured receiving them. The optional `trailers` indicates whether
+                /// error occurred receiving them. The optional `trailers` indicates whether
                 /// or not trailers were present in the body.
                 ///
                 /// When some `trailers` are returned by this method, the `trailers`
@@ -4376,7 +4395,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]future-trailers.get"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -4966,7 +4985,7 @@ pub mod wasi {
                 pub fn new(headers: Headers) -> Self {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[constructor]outgoing-response"]
                             fn wit_import0(_: i32) -> i32;
@@ -4988,7 +5007,7 @@ pub mod wasi {
                 pub fn status_code(&self) -> StatusCode {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-response.status-code"]
                             fn wit_import0(_: i32) -> i32;
@@ -5012,7 +5031,7 @@ pub mod wasi {
                 ) -> Result<(), ()> {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-response.set-status-code"]
                             fn wit_import0(_: i32, _: i32) -> i32;
@@ -5046,12 +5065,12 @@ pub mod wasi {
                 /// `delete` operations will fail with `header-error.immutable`.
                 ///
                 /// This headers resource is a child: it must be dropped before the parent
-                /// `outgoing-request` is dropped, or its ownership is transfered to
+                /// `outgoing-request` is dropped, or its ownership is transferred to
                 /// another component by e.g. `outgoing-handler.handle`.
                 pub fn headers(&self) -> Headers {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-response.headers"]
                             fn wit_import0(_: i32) -> i32;
@@ -5081,7 +5100,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-response.body"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -5130,7 +5149,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]outgoing-body.write"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -5195,7 +5214,7 @@ pub mod wasi {
                         };
                         let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[static]outgoing-body.finish"]
                             fn wit_import2(_: i32, _: i32, _: i32, _: *mut u8);
@@ -5754,12 +5773,12 @@ pub mod wasi {
             impl FutureIncomingResponse {
                 #[allow(unused_unsafe, clippy::all)]
                 /// Returns a pollable which becomes ready when either the Response has
-                /// been received, or an error has occured. When this pollable is ready,
+                /// been received, or an error has occurred. When this pollable is ready,
                 /// the `get` method will return `some`.
                 pub fn subscribe(&self) -> Pollable {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]future-incoming-response.subscribe"]
                             fn wit_import0(_: i32) -> i32;
@@ -5789,8 +5808,8 @@ pub mod wasi {
                 /// is `some`, and error on subsequent calls.
                 ///
                 /// The inner `result` represents that either the incoming HTTP Response
-                /// status and headers have recieved successfully, or that an error
-                /// occured. Errors may also occur while consuming the response body,
+                /// status and headers have received successfully, or that an error
+                /// occurred. Errors may also occur while consuming the response body,
                 /// but those will be reported by the `incoming-body` and its
                 /// `output-stream` child.
                 pub fn get(
@@ -5809,7 +5828,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:http/types@0.2.0")]
+                        #[link(wasm_import_module = "wasi:http/types@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]future-incoming-response.get"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -6406,7 +6425,7 @@ pub mod wasi {
             ) -> () {
                 unsafe {
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:http/incoming-handler@0.2.0")]
+                    #[link(wasm_import_module = "wasi:http/incoming-handler@0.2.3")]
                     unsafe extern "C" {
                         #[link_name = "handle"]
                         fn wit_import0(_: i32, _: i32);
@@ -6463,7 +6482,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:io/poll@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/poll@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]pollable"]
                             fn drop(_: u32);
@@ -6480,7 +6499,7 @@ pub mod wasi {
                 pub fn ready(&self) -> bool {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/poll@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/poll@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]pollable.ready"]
                             fn wit_import0(_: i32) -> i32;
@@ -6504,7 +6523,7 @@ pub mod wasi {
                 pub fn block(&self) -> () {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/poll@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/poll@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]pollable.block"]
                             fn wit_import0(_: i32);
@@ -6526,8 +6545,9 @@ pub mod wasi {
             /// The result `list<u32>` contains one or more indices of handles in the
             /// argument list that is ready for I/O.
             ///
-            /// If the list contains more elements than can be indexed with a `u32`
-            /// value, this function traps.
+            /// This function traps if either:
+            /// - the list is empty, or:
+            /// - the list contains more elements than can be indexed with a `u32` value.
             ///
             /// A timeout can be implemented by adding a pollable from the
             /// wasi-clocks API to the list.
@@ -6535,7 +6555,7 @@ pub mod wasi {
             /// This function does not return a `result`; polling in itself does not
             /// do any I/O so it doesn't fail. If any of the I/O sources identified by
             /// the pollables has an error, it is indicated by marking the source as
-            /// being reaedy for I/O.
+            /// being ready for I/O.
             pub fn poll(in_: &[&Pollable]) -> _rt::Vec<u32> {
                 unsafe {
                     #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
@@ -6572,7 +6592,7 @@ pub mod wasi {
                     }
                     let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:io/poll@0.2.0")]
+                    #[link(wasm_import_module = "wasi:io/poll@0.2.3")]
                     unsafe extern "C" {
                         #[link_name = "poll"]
                         fn wit_import2(_: *mut u8, _: usize, _: *mut u8);
@@ -6610,13 +6630,11 @@ pub mod wasi {
             /// `wasi:io/streams/stream-error` type.
             ///
             /// To provide more specific error information, other interfaces may
-            /// provide functions to further "downcast" this error into more specific
-            /// error information. For example, `error`s returned in streams derived
-            /// from filesystem types to be described using the filesystem's own
-            /// error-code type, using the function
-            /// `wasi:filesystem/types/filesystem-error-code`, which takes a parameter
-            /// `borrow<error>` and returns
-            /// `option<wasi:filesystem/types/error-code>`.
+            /// offer functions to "downcast" this error into more specific types. For example,
+            /// errors returned from streams derived from filesystem types can be described using
+            /// the filesystem's own error-code type. This is done using the function
+            /// `wasi:filesystem/types/filesystem-error-code`, which takes a `borrow<error>`
+            /// parameter and returns an `option<wasi:filesystem/types/error-code>`.
             ///
             /// The set of functions which can "downcast" an `error` into a more
             /// concrete type is open.
@@ -6648,7 +6666,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:io/error@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/error@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]error"]
                             fn drop(_: u32);
@@ -6681,7 +6699,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/error@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/error@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]error.to-debug-string"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -6721,6 +6739,9 @@ pub mod wasi {
                 /// The last operation (a write or flush) failed before completion.
                 ///
                 /// More information is available in the `error` payload.
+                ///
+                /// After this, the stream will be closed. All future operations return
+                /// `stream-error::closed`.
                 LastOperationFailed(Error),
                 /// The stream is closed: no more input will be accepted by the
                 /// stream. A closed output-stream will return this error on all
@@ -6789,7 +6810,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]input-stream"]
                             fn drop(_: u32);
@@ -6806,6 +6827,10 @@ pub mod wasi {
             /// promptly, which could even be zero. To wait for the stream to be ready to
             /// accept data, the `subscribe` function to obtain a `pollable` which can be
             /// polled for using `wasi:io/poll`.
+            ///
+            /// Dropping an `output-stream` while there's still an active write in
+            /// progress may result in the data being lost. Before dropping the stream,
+            /// be sure to fully flush your writes.
             #[derive(Debug)]
             #[repr(transparent)]
             pub struct OutputStream {
@@ -6834,7 +6859,7 @@ pub mod wasi {
                     unreachable!();
                     #[cfg(target_arch = "wasm32")]
                     {
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[resource-drop]output-stream"]
                             fn drop(_: u32);
@@ -6886,7 +6911,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]input-stream.read"]
                             fn wit_import1(_: i32, _: i64, _: *mut u8);
@@ -6969,7 +6994,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]input-stream.blocking-read"]
                             fn wit_import1(_: i32, _: i64, _: *mut u8);
@@ -7045,7 +7070,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]input-stream.skip"]
                             fn wit_import1(_: i32, _: i64, _: *mut u8);
@@ -7109,7 +7134,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]input-stream.blocking-skip"]
                             fn wit_import1(_: i32, _: i64, _: *mut u8);
@@ -7171,7 +7196,7 @@ pub mod wasi {
                 pub fn subscribe(&self) -> Pollable {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]input-stream.subscribe"]
                             fn wit_import0(_: i32) -> i32;
@@ -7209,7 +7234,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.check-write"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -7285,7 +7310,7 @@ pub mod wasi {
                         let len0 = vec0.len();
                         let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.write"]
                             fn wit_import2(_: i32, _: *mut u8, _: usize, _: *mut u8);
@@ -7384,7 +7409,7 @@ pub mod wasi {
                         let len0 = vec0.len();
                         let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.blocking-write-and-flush"]
                             fn wit_import2(_: i32, _: *mut u8, _: usize, _: *mut u8);
@@ -7463,7 +7488,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.flush"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -7522,7 +7547,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.blocking-flush"]
                             fn wit_import1(_: i32, _: *mut u8);
@@ -7571,7 +7596,7 @@ pub mod wasi {
             impl OutputStream {
                 #[allow(unused_unsafe, clippy::all)]
                 /// Create a `pollable` which will resolve once the output-stream
-                /// is ready for more writing, or an error has occured. When this
+                /// is ready for more writing, or an error has occurred. When this
                 /// pollable is ready, `check-write` will return `ok(n)` with n>0, or an
                 /// error.
                 ///
@@ -7583,7 +7608,7 @@ pub mod wasi {
                 pub fn subscribe(&self) -> Pollable {
                     unsafe {
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.subscribe"]
                             fn wit_import0(_: i32) -> i32;
@@ -7618,7 +7643,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.write-zeroes"]
                             fn wit_import1(_: i32, _: i64, _: *mut u8);
@@ -7704,7 +7729,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.blocking-write-zeroes-and-flush"]
                             fn wit_import1(_: i32, _: i64, _: *mut u8);
@@ -7756,7 +7781,7 @@ pub mod wasi {
                 #[allow(unused_unsafe, clippy::all)]
                 /// Read from one stream and write to another.
                 ///
-                /// The behavior of splice is equivelant to:
+                /// The behavior of splice is equivalent to:
                 /// 1. calling `check-write` on the `output-stream`
                 /// 2. calling `read` on the `input-stream` with the smaller of the
                 /// `check-write` permitted length and the `len` provided to `splice`
@@ -7780,7 +7805,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.splice"]
                             fn wit_import1(_: i32, _: i32, _: i64, _: *mut u8);
@@ -7861,7 +7886,7 @@ pub mod wasi {
                         );
                         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                         #[cfg(target_arch = "wasm32")]
-                        #[link(wasm_import_module = "wasi:io/streams@0.2.0")]
+                        #[link(wasm_import_module = "wasi:io/streams@0.2.3")]
                         unsafe extern "C" {
                             #[link_name = "[method]output-stream.blocking-splice"]
                             fn wit_import1(_: i32, _: i32, _: i64, _: *mut u8);
@@ -7974,17 +7999,17 @@ pub mod exports {
                     ) -> ();
                 }
                 #[doc(hidden)]
-                macro_rules! __export_wasi_http_incoming_handler_0_2_0_cabi {
+                macro_rules! __export_wasi_http_incoming_handler_0_2_3_cabi {
                     ($ty:ident with_types_in $($path_to_types:tt)*) => {
                         const _ : () = { #[unsafe (export_name =
-                        "wasi:http/incoming-handler@0.2.0#handle")] unsafe extern "C" fn
+                        "wasi:http/incoming-handler@0.2.3#handle")] unsafe extern "C" fn
                         export_handle(arg0 : i32, arg1 : i32,) { unsafe {
                         $($path_to_types)*:: _export_handle_cabi::<$ty > (arg0, arg1) } }
                         };
                     };
                 }
                 #[doc(hidden)]
-                pub(crate) use __export_wasi_http_incoming_handler_0_2_0_cabi;
+                pub(crate) use __export_wasi_http_incoming_handler_0_2_3_cabi;
             }
         }
     }
@@ -8213,7 +8238,7 @@ macro_rules! __export_router_impl {
     };
     ($ty:ident with_types_in $($path_to_types_root:tt)*) => {
         $($path_to_types_root)*::
-        exports::wasi::http::incoming_handler::__export_wasi_http_incoming_handler_0_2_0_cabi!($ty
+        exports::wasi::http::incoming_handler::__export_wasi_http_incoming_handler_0_2_3_cabi!($ty
         with_types_in $($path_to_types_root)*:: exports::wasi::http::incoming_handler);
     };
 }
@@ -8223,19 +8248,19 @@ pub(crate) use __export_router_impl as export;
 #[unsafe(link_section = "component-type:wit-bindgen:0.41.0:fermyon:router:router:encoded world")]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 6758] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xe93\x01A\x02\x01A&\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 6774] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xf93\x01A\x02\x01A&\x01\
 B\x0a\x04\0\x08pollable\x03\x01\x01h\0\x01@\x01\x04self\x01\0\x7f\x04\0\x16[meth\
 od]pollable.ready\x01\x02\x01@\x01\x04self\x01\x01\0\x04\0\x16[method]pollable.b\
 lock\x01\x03\x01p\x01\x01py\x01@\x01\x02in\x04\0\x05\x04\0\x04poll\x01\x06\x03\0\
-\x12wasi:io/poll@0.2.0\x05\0\x02\x03\0\0\x08pollable\x01B\x0f\x02\x03\x02\x01\x01\
+\x12wasi:io/poll@0.2.3\x05\0\x02\x03\0\0\x08pollable\x01B\x0f\x02\x03\x02\x01\x01\
 \x04\0\x08pollable\x03\0\0\x01w\x04\0\x07instant\x03\0\x02\x01w\x04\0\x08duratio\
 n\x03\0\x04\x01@\0\0\x03\x04\0\x03now\x01\x06\x01@\0\0\x05\x04\0\x0aresolution\x01\
 \x07\x01i\x01\x01@\x01\x04when\x03\0\x08\x04\0\x11subscribe-instant\x01\x09\x01@\
 \x01\x04when\x05\0\x08\x04\0\x12subscribe-duration\x01\x0a\x03\0!wasi:clocks/mon\
-otonic-clock@0.2.0\x05\x02\x01B\x04\x04\0\x05error\x03\x01\x01h\0\x01@\x01\x04se\
+otonic-clock@0.2.3\x05\x02\x01B\x04\x04\0\x05error\x03\x01\x01h\0\x01@\x01\x04se\
 lf\x01\0s\x04\0\x1d[method]error.to-debug-string\x01\x02\x03\0\x13wasi:io/error@\
-0.2.0\x05\x03\x02\x03\0\x02\x05error\x01B(\x02\x03\x02\x01\x04\x04\0\x05error\x03\
+0.2.3\x05\x03\x02\x03\0\x02\x05error\x01B(\x02\x03\x02\x01\x04\x04\0\x05error\x03\
 \0\0\x02\x03\x02\x01\x01\x04\0\x08pollable\x03\0\x02\x01i\x01\x01q\x02\x15last-o\
 peration-failed\x01\x04\0\x06closed\0\0\x04\0\x0cstream-error\x03\0\x05\x04\0\x0c\
 input-stream\x03\x01\x04\0\x0doutput-stream\x03\x01\x01h\x07\x01p}\x01j\x01\x0a\x01\
@@ -8253,8 +8278,8 @@ tput-stream.blocking-write-and-flush\x01\x14\x01@\x01\x04self\x11\0\x13\x04\0\x1
 \x17\x04\05[method]output-stream.blocking-write-zeroes-and-flush\x01\x17\x01@\x03\
 \x04self\x11\x03src\x09\x03lenw\0\x0d\x04\0\x1c[method]output-stream.splice\x01\x18\
 \x04\0%[method]output-stream.blocking-splice\x01\x18\x03\0\x15wasi:io/streams@0.\
-2.0\x05\x05\x02\x03\0\x01\x08duration\x02\x03\0\x03\x0cinput-stream\x02\x03\0\x03\
-\x0doutput-stream\x01B\xc0\x01\x02\x03\x02\x01\x06\x04\0\x08duration\x03\0\0\x02\
+2.3\x05\x05\x02\x03\0\x01\x08duration\x02\x03\0\x03\x0cinput-stream\x02\x03\0\x03\
+\x0doutput-stream\x01B\xc1\x01\x02\x03\x02\x01\x06\x04\0\x08duration\x03\0\0\x02\
 \x03\x02\x01\x07\x04\0\x0cinput-stream\x03\0\x02\x02\x03\x02\x01\x08\x04\0\x0dou\
 tput-stream\x03\0\x04\x02\x03\x02\x01\x04\x04\0\x08io-error\x03\0\x06\x02\x03\x02\
 \x01\x01\x04\0\x08pollable\x03\0\x08\x01q\x0a\x03get\0\0\x04head\0\0\x04post\0\0\
@@ -8281,84 +8306,84 @@ HTTP-response-transfer-coding\x01\x0e\0\x1cHTTP-response-content-coding\x01\x0e\
 \x15HTTP-response-timeout\0\0\x13HTTP-upgrade-failed\0\0\x13HTTP-protocol-error\0\
 \0\x0dloop-detected\0\0\x13configuration-error\0\0\x0einternal-error\x01\x0e\0\x04\
 \0\x0aerror-code\x03\0\x1a\x01q\x03\x0einvalid-syntax\0\0\x09forbidden\0\0\x09im\
-mutable\0\0\x04\0\x0cheader-error\x03\0\x1c\x01s\x04\0\x09field-key\x03\0\x1e\x01\
-p}\x04\0\x0bfield-value\x03\0\x20\x04\0\x06fields\x03\x01\x04\0\x07headers\x03\0\
-\"\x04\0\x08trailers\x03\0\"\x04\0\x10incoming-request\x03\x01\x04\0\x10outgoing\
--request\x03\x01\x04\0\x0frequest-options\x03\x01\x04\0\x11response-outparam\x03\
-\x01\x01{\x04\0\x0bstatus-code\x03\0)\x04\0\x11incoming-response\x03\x01\x04\0\x0d\
-incoming-body\x03\x01\x04\0\x0ffuture-trailers\x03\x01\x04\0\x11outgoing-respons\
-e\x03\x01\x04\0\x0doutgoing-body\x03\x01\x04\0\x18future-incoming-response\x03\x01\
-\x01i\"\x01@\0\01\x04\0\x13[constructor]fields\x012\x01o\x02\x1f!\x01p3\x01j\x01\
-1\x01\x1d\x01@\x01\x07entries4\05\x04\0\x18[static]fields.from-list\x016\x01h\"\x01\
-p!\x01@\x02\x04self7\x04name\x1f\08\x04\0\x12[method]fields.get\x019\x01@\x02\x04\
-self7\x04name\x1f\0\x7f\x04\0\x12[method]fields.has\x01:\x01j\0\x01\x1d\x01@\x03\
-\x04self7\x04name\x1f\x05value8\0;\x04\0\x12[method]fields.set\x01<\x01@\x02\x04\
-self7\x04name\x1f\0;\x04\0\x15[method]fields.delete\x01=\x01@\x03\x04self7\x04na\
-me\x1f\x05value!\0;\x04\0\x15[method]fields.append\x01>\x01@\x01\x04self7\04\x04\
-\0\x16[method]fields.entries\x01?\x01@\x01\x04self7\01\x04\0\x14[method]fields.c\
-lone\x01@\x01h%\x01@\x01\x04self\xc1\0\0\x0b\x04\0\x1f[method]incoming-request.m\
-ethod\x01B\x01@\x01\x04self\xc1\0\0\x0e\x04\0([method]incoming-request.path-with\
--query\x01C\x01k\x0d\x01@\x01\x04self\xc1\0\0\xc4\0\x04\0\x1f[method]incoming-re\
-quest.scheme\x01E\x04\0\"[method]incoming-request.authority\x01C\x01i#\x01@\x01\x04\
-self\xc1\0\0\xc6\0\x04\0\x20[method]incoming-request.headers\x01G\x01i,\x01j\x01\
-\xc8\0\0\x01@\x01\x04self\xc1\0\0\xc9\0\x04\0\x20[method]incoming-request.consum\
-e\x01J\x01i&\x01@\x01\x07headers\xc6\0\0\xcb\0\x04\0\x1d[constructor]outgoing-re\
-quest\x01L\x01h&\x01i/\x01j\x01\xce\0\0\x01@\x01\x04self\xcd\0\0\xcf\0\x04\0\x1d\
-[method]outgoing-request.body\x01P\x01@\x01\x04self\xcd\0\0\x0b\x04\0\x1f[method\
-]outgoing-request.method\x01Q\x01j\0\0\x01@\x02\x04self\xcd\0\x06method\x0b\0\xd2\
-\0\x04\0#[method]outgoing-request.set-method\x01S\x01@\x01\x04self\xcd\0\0\x0e\x04\
-\0([method]outgoing-request.path-with-query\x01T\x01@\x02\x04self\xcd\0\x0fpath-\
-with-query\x0e\0\xd2\0\x04\0,[method]outgoing-request.set-path-with-query\x01U\x01\
-@\x01\x04self\xcd\0\0\xc4\0\x04\0\x1f[method]outgoing-request.scheme\x01V\x01@\x02\
-\x04self\xcd\0\x06scheme\xc4\0\0\xd2\0\x04\0#[method]outgoing-request.set-scheme\
-\x01W\x04\0\"[method]outgoing-request.authority\x01T\x01@\x02\x04self\xcd\0\x09a\
-uthority\x0e\0\xd2\0\x04\0&[method]outgoing-request.set-authority\x01X\x01@\x01\x04\
-self\xcd\0\0\xc6\0\x04\0\x20[method]outgoing-request.headers\x01Y\x01i'\x01@\0\0\
-\xda\0\x04\0\x1c[constructor]request-options\x01[\x01h'\x01k\x01\x01@\x01\x04sel\
-f\xdc\0\0\xdd\0\x04\0'[method]request-options.connect-timeout\x01^\x01@\x02\x04s\
-elf\xdc\0\x08duration\xdd\0\0\xd2\0\x04\0+[method]request-options.set-connect-ti\
-meout\x01_\x04\0*[method]request-options.first-byte-timeout\x01^\x04\0.[method]r\
-equest-options.set-first-byte-timeout\x01_\x04\0-[method]request-options.between\
--bytes-timeout\x01^\x04\01[method]request-options.set-between-bytes-timeout\x01_\
-\x01i(\x01i.\x01j\x01\xe1\0\x01\x1b\x01@\x02\x05param\xe0\0\x08response\xe2\0\x01\
-\0\x04\0\x1d[static]response-outparam.set\x01c\x01h+\x01@\x01\x04self\xe4\0\0*\x04\
-\0\x20[method]incoming-response.status\x01e\x01@\x01\x04self\xe4\0\0\xc6\0\x04\0\
-![method]incoming-response.headers\x01f\x01@\x01\x04self\xe4\0\0\xc9\0\x04\0![me\
-thod]incoming-response.consume\x01g\x01h,\x01i\x03\x01j\x01\xe9\0\0\x01@\x01\x04\
-self\xe8\0\0\xea\0\x04\0\x1c[method]incoming-body.stream\x01k\x01i-\x01@\x01\x04\
-this\xc8\0\0\xec\0\x04\0\x1c[static]incoming-body.finish\x01m\x01h-\x01i\x09\x01\
-@\x01\x04self\xee\0\0\xef\0\x04\0![method]future-trailers.subscribe\x01p\x01i$\x01\
-k\xf1\0\x01j\x01\xf2\0\x01\x1b\x01j\x01\xf3\0\0\x01k\xf4\0\x01@\x01\x04self\xee\0\
-\0\xf5\0\x04\0\x1b[method]future-trailers.get\x01v\x01@\x01\x07headers\xc6\0\0\xe1\
-\0\x04\0\x1e[constructor]outgoing-response\x01w\x01h.\x01@\x01\x04self\xf8\0\0*\x04\
-\0%[method]outgoing-response.status-code\x01y\x01@\x02\x04self\xf8\0\x0bstatus-c\
-ode*\0\xd2\0\x04\0)[method]outgoing-response.set-status-code\x01z\x01@\x01\x04se\
-lf\xf8\0\0\xc6\0\x04\0![method]outgoing-response.headers\x01{\x01@\x01\x04self\xf8\
-\0\0\xcf\0\x04\0\x1e[method]outgoing-response.body\x01|\x01h/\x01i\x05\x01j\x01\xfe\
-\0\0\x01@\x01\x04self\xfd\0\0\xff\0\x04\0\x1b[method]outgoing-body.write\x01\x80\
-\x01\x01j\0\x01\x1b\x01@\x02\x04this\xce\0\x08trailers\xf2\0\0\x81\x01\x04\0\x1c\
-[static]outgoing-body.finish\x01\x82\x01\x01h0\x01@\x01\x04self\x83\x01\0\xef\0\x04\
-\0*[method]future-incoming-response.subscribe\x01\x84\x01\x01i+\x01j\x01\x85\x01\
-\x01\x1b\x01j\x01\x86\x01\0\x01k\x87\x01\x01@\x01\x04self\x83\x01\0\x88\x01\x04\0\
-$[method]future-incoming-response.get\x01\x89\x01\x01h\x07\x01k\x1b\x01@\x01\x03\
-err\x8a\x01\0\x8b\x01\x04\0\x0fhttp-error-code\x01\x8c\x01\x03\0\x15wasi:http/ty\
-pes@0.2.0\x05\x09\x02\x03\0\x04\x10outgoing-request\x03\0\x10outgoing-request\x03\
-\0\x0a\x02\x03\0\x04\x10incoming-request\x03\0\x10incoming-request\x03\0\x0c\x02\
-\x03\0\x04\x0dincoming-body\x03\0\x0dincoming-body\x03\0\x0e\x02\x03\0\x04\x11re\
-sponse-outparam\x01B\x08\x02\x03\x02\x01\x0c\x04\0\x10incoming-request\x03\0\0\x02\
-\x03\x02\x01\x10\x04\0\x11response-outparam\x03\0\x02\x01i\x01\x01i\x03\x01@\x02\
-\x07request\x04\x0cresponse-out\x05\x01\0\x04\0\x06handle\x01\x06\x03\0\x20wasi:\
-http/incoming-handler@0.2.0\x05\x11\x01@\0\0s\x03\0\x0cget-manifest\x01\x12\x01@\
-\x01\x0ccomponent-ids\x01\0\x03\0\x10set-component-id\x01\x13\x01B\x05\x02\x03\x02\
-\x01\x08\x04\0\x0doutput-stream\x03\0\0\x01i\x01\x01@\0\0\x02\x04\0\x0aget-stdou\
-t\x01\x03\x03\0\x15wasi:cli/stdout@0.2.0\x05\x14\x01i\x0b\x01i\x0f\x01k\x16\x01i\
-\x0d\x01@\x02\x07request\x15\x0dincoming-body\x17\0\x18\x03\0\x0bnew-request\x01\
-\x19\x01B\x08\x02\x03\x02\x01\x0c\x04\0\x10incoming-request\x03\0\0\x02\x03\x02\x01\
-\x10\x04\0\x11response-outparam\x03\0\x02\x01i\x01\x01i\x03\x01@\x02\x07request\x04\
-\x0cresponse-out\x05\x01\0\x04\0\x06handle\x01\x06\x04\0\x20wasi:http/incoming-h\
-andler@0.2.0\x05\x1a\x04\0\x15fermyon:router/router\x04\0\x0b\x0c\x01\0\x06route\
-r\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10\
-wit-bindgen-rust\x060.41.0";
+mutable\0\0\x04\0\x0cheader-error\x03\0\x1c\x01s\x04\0\x09field-key\x03\0\x1e\x04\
+\0\x0afield-name\x03\0\x1f\x01p}\x04\0\x0bfield-value\x03\0!\x04\0\x06fields\x03\
+\x01\x04\0\x07headers\x03\0#\x04\0\x08trailers\x03\0#\x04\0\x10incoming-request\x03\
+\x01\x04\0\x10outgoing-request\x03\x01\x04\0\x0frequest-options\x03\x01\x04\0\x11\
+response-outparam\x03\x01\x01{\x04\0\x0bstatus-code\x03\0*\x04\0\x11incoming-res\
+ponse\x03\x01\x04\0\x0dincoming-body\x03\x01\x04\0\x0ffuture-trailers\x03\x01\x04\
+\0\x11outgoing-response\x03\x01\x04\0\x0doutgoing-body\x03\x01\x04\0\x18future-i\
+ncoming-response\x03\x01\x01i#\x01@\0\02\x04\0\x13[constructor]fields\x013\x01o\x02\
+\x20\"\x01p4\x01j\x012\x01\x1d\x01@\x01\x07entries5\06\x04\0\x18[static]fields.f\
+rom-list\x017\x01h#\x01p\"\x01@\x02\x04self8\x04name\x20\09\x04\0\x12[method]fie\
+lds.get\x01:\x01@\x02\x04self8\x04name\x20\0\x7f\x04\0\x12[method]fields.has\x01\
+;\x01j\0\x01\x1d\x01@\x03\x04self8\x04name\x20\x05value9\0<\x04\0\x12[method]fie\
+lds.set\x01=\x01@\x02\x04self8\x04name\x20\0<\x04\0\x15[method]fields.delete\x01\
+>\x01@\x03\x04self8\x04name\x20\x05value\"\0<\x04\0\x15[method]fields.append\x01\
+?\x01@\x01\x04self8\05\x04\0\x16[method]fields.entries\x01@\x01@\x01\x04self8\02\
+\x04\0\x14[method]fields.clone\x01A\x01h&\x01@\x01\x04self\xc2\0\0\x0b\x04\0\x1f\
+[method]incoming-request.method\x01C\x01@\x01\x04self\xc2\0\0\x0e\x04\0([method]\
+incoming-request.path-with-query\x01D\x01k\x0d\x01@\x01\x04self\xc2\0\0\xc5\0\x04\
+\0\x1f[method]incoming-request.scheme\x01F\x04\0\"[method]incoming-request.autho\
+rity\x01D\x01i$\x01@\x01\x04self\xc2\0\0\xc7\0\x04\0\x20[method]incoming-request\
+.headers\x01H\x01i-\x01j\x01\xc9\0\0\x01@\x01\x04self\xc2\0\0\xca\0\x04\0\x20[me\
+thod]incoming-request.consume\x01K\x01i'\x01@\x01\x07headers\xc7\0\0\xcc\0\x04\0\
+\x1d[constructor]outgoing-request\x01M\x01h'\x01i0\x01j\x01\xcf\0\0\x01@\x01\x04\
+self\xce\0\0\xd0\0\x04\0\x1d[method]outgoing-request.body\x01Q\x01@\x01\x04self\xce\
+\0\0\x0b\x04\0\x1f[method]outgoing-request.method\x01R\x01j\0\0\x01@\x02\x04self\
+\xce\0\x06method\x0b\0\xd3\0\x04\0#[method]outgoing-request.set-method\x01T\x01@\
+\x01\x04self\xce\0\0\x0e\x04\0([method]outgoing-request.path-with-query\x01U\x01\
+@\x02\x04self\xce\0\x0fpath-with-query\x0e\0\xd3\0\x04\0,[method]outgoing-reques\
+t.set-path-with-query\x01V\x01@\x01\x04self\xce\0\0\xc5\0\x04\0\x1f[method]outgo\
+ing-request.scheme\x01W\x01@\x02\x04self\xce\0\x06scheme\xc5\0\0\xd3\0\x04\0#[me\
+thod]outgoing-request.set-scheme\x01X\x04\0\"[method]outgoing-request.authority\x01\
+U\x01@\x02\x04self\xce\0\x09authority\x0e\0\xd3\0\x04\0&[method]outgoing-request\
+.set-authority\x01Y\x01@\x01\x04self\xce\0\0\xc7\0\x04\0\x20[method]outgoing-req\
+uest.headers\x01Z\x01i(\x01@\0\0\xdb\0\x04\0\x1c[constructor]request-options\x01\
+\\\x01h(\x01k\x01\x01@\x01\x04self\xdd\0\0\xde\0\x04\0'[method]request-options.c\
+onnect-timeout\x01_\x01@\x02\x04self\xdd\0\x08duration\xde\0\0\xd3\0\x04\0+[meth\
+od]request-options.set-connect-timeout\x01`\x04\0*[method]request-options.first-\
+byte-timeout\x01_\x04\0.[method]request-options.set-first-byte-timeout\x01`\x04\0\
+-[method]request-options.between-bytes-timeout\x01_\x04\01[method]request-option\
+s.set-between-bytes-timeout\x01`\x01i)\x01i/\x01j\x01\xe2\0\x01\x1b\x01@\x02\x05\
+param\xe1\0\x08response\xe3\0\x01\0\x04\0\x1d[static]response-outparam.set\x01d\x01\
+h,\x01@\x01\x04self\xe5\0\0+\x04\0\x20[method]incoming-response.status\x01f\x01@\
+\x01\x04self\xe5\0\0\xc7\0\x04\0![method]incoming-response.headers\x01g\x01@\x01\
+\x04self\xe5\0\0\xca\0\x04\0![method]incoming-response.consume\x01h\x01h-\x01i\x03\
+\x01j\x01\xea\0\0\x01@\x01\x04self\xe9\0\0\xeb\0\x04\0\x1c[method]incoming-body.\
+stream\x01l\x01i.\x01@\x01\x04this\xc9\0\0\xed\0\x04\0\x1c[static]incoming-body.\
+finish\x01n\x01h.\x01i\x09\x01@\x01\x04self\xef\0\0\xf0\0\x04\0![method]future-t\
+railers.subscribe\x01q\x01i%\x01k\xf2\0\x01j\x01\xf3\0\x01\x1b\x01j\x01\xf4\0\0\x01\
+k\xf5\0\x01@\x01\x04self\xef\0\0\xf6\0\x04\0\x1b[method]future-trailers.get\x01w\
+\x01@\x01\x07headers\xc7\0\0\xe2\0\x04\0\x1e[constructor]outgoing-response\x01x\x01\
+h/\x01@\x01\x04self\xf9\0\0+\x04\0%[method]outgoing-response.status-code\x01z\x01\
+@\x02\x04self\xf9\0\x0bstatus-code+\0\xd3\0\x04\0)[method]outgoing-response.set-\
+status-code\x01{\x01@\x01\x04self\xf9\0\0\xc7\0\x04\0![method]outgoing-response.\
+headers\x01|\x01@\x01\x04self\xf9\0\0\xd0\0\x04\0\x1e[method]outgoing-response.b\
+ody\x01}\x01h0\x01i\x05\x01j\x01\xff\0\0\x01@\x01\x04self\xfe\0\0\x80\x01\x04\0\x1b\
+[method]outgoing-body.write\x01\x81\x01\x01j\0\x01\x1b\x01@\x02\x04this\xcf\0\x08\
+trailers\xf3\0\0\x82\x01\x04\0\x1c[static]outgoing-body.finish\x01\x83\x01\x01h1\
+\x01@\x01\x04self\x84\x01\0\xf0\0\x04\0*[method]future-incoming-response.subscri\
+be\x01\x85\x01\x01i,\x01j\x01\x86\x01\x01\x1b\x01j\x01\x87\x01\0\x01k\x88\x01\x01\
+@\x01\x04self\x84\x01\0\x89\x01\x04\0$[method]future-incoming-response.get\x01\x8a\
+\x01\x01h\x07\x01k\x1b\x01@\x01\x03err\x8b\x01\0\x8c\x01\x04\0\x0fhttp-error-cod\
+e\x01\x8d\x01\x03\0\x15wasi:http/types@0.2.3\x05\x09\x02\x03\0\x04\x10outgoing-r\
+equest\x03\0\x10outgoing-request\x03\0\x0a\x02\x03\0\x04\x10incoming-request\x03\
+\0\x10incoming-request\x03\0\x0c\x02\x03\0\x04\x0dincoming-body\x03\0\x0dincomin\
+g-body\x03\0\x0e\x02\x03\0\x04\x11response-outparam\x01B\x08\x02\x03\x02\x01\x0c\
+\x04\0\x10incoming-request\x03\0\0\x02\x03\x02\x01\x10\x04\0\x11response-outpara\
+m\x03\0\x02\x01i\x01\x01i\x03\x01@\x02\x07request\x04\x0cresponse-out\x05\x01\0\x04\
+\0\x06handle\x01\x06\x03\0\x20wasi:http/incoming-handler@0.2.3\x05\x11\x01@\0\0s\
+\x03\0\x0cget-manifest\x01\x12\x01@\x01\x0ccomponent-ids\x01\0\x03\0\x10set-comp\
+onent-id\x01\x13\x01B\x05\x02\x03\x02\x01\x08\x04\0\x0doutput-stream\x03\0\0\x01\
+i\x01\x01@\0\0\x02\x04\0\x0aget-stdout\x01\x03\x03\0\x15wasi:cli/stdout@0.2.3\x05\
+\x14\x01i\x0b\x01i\x0f\x01k\x16\x01i\x0d\x01@\x02\x07request\x15\x0dincoming-bod\
+y\x17\0\x18\x03\0\x0bnew-request\x01\x19\x01B\x08\x02\x03\x02\x01\x0c\x04\0\x10i\
+ncoming-request\x03\0\0\x02\x03\x02\x01\x10\x04\0\x11response-outparam\x03\0\x02\
+\x01i\x01\x01i\x03\x01@\x02\x07request\x04\x0cresponse-out\x05\x01\0\x04\0\x06ha\
+ndle\x01\x06\x04\0\x20wasi:http/incoming-handler@0.2.3\x05\x1a\x04\0\x15fermyon:\
+router/router\x04\0\x0b\x0c\x01\0\x06router\x03\0\0\0G\x09producers\x01\x0cproce\
+ssed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {
