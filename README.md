@@ -55,7 +55,7 @@ Next, we'll need to tell `spin-test` where our test lives and how to build it. W
 ```toml
 [component.my-component.tool.spin-test]
 # A relative path to where the built test component binary will live.
-source = "target/wasm32-wasi/release/test.wasm"
+source = "target/wasm32-wasip1/release/test.wasm"
 # A command for building the target component.
 build = "cargo component build --release"
 # The directory where the `build` command should be run.
