@@ -15,8 +15,7 @@ spin-locked-app = { git = "https://github.com/spinframework/spin", rev = "9906b4
 spin-outbound-networking-config = { git = "https://github.com/spinframework/spin", rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
 toml = { workspace = true }
 wit-bindgen-rt = { workspace = true }
-# rusqlite > 0.25 fails to build with various linker errors
-# rusqlite = { version = "0.25", features = ["bundled", "wasm32-wasi-vfs"] }
+rusqlite = { version = "0.36", features = ["bundled", "wasm32-wasi-vfs"] }
 
 
 [lib]
