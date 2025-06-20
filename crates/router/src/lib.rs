@@ -1,4 +1,5 @@
 #[allow(warnings)]
+#[rustfmt::skip]
 mod bindings;
 
 use std::{borrow::Cow, fmt::Display};
