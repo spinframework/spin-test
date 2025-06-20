@@ -107,11 +107,7 @@ fn run<'a, 'b>(
 
     cmd.arg("-c");
     cmd.envs(env);
-    let c = args
-        .into_iter()
-        .map(Into::into)
-        .collect::<Vec<&str>>()
-        .join(" ");
+    let c = args.into_iter().collect::<Vec<_>>().join(" ");
     cmd.arg(&c);
 
     (c, cmd.output().unwrap())

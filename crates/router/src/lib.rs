@@ -88,10 +88,7 @@ enum RoutingResult<'router, 'path> {
 }
 
 /// Create a router from the Spin manifest.
-fn router<'a>(
-    manifest: &spin_manifest::schema::v2::AppManifest,
-    base: &str,
-) -> anyhow::Result<Router> {
+fn router(manifest: &spin_manifest::schema::v2::AppManifest, base: &str) -> anyhow::Result<Router> {
     let routes = manifest
         .triggers
         .get("http")
@@ -186,7 +183,7 @@ fn calculate_default_headers<'a>(
     };
     let host = req
         .headers()
-        .get(&"Host".to_owned())
+        .get("Host")
         .into_iter()
         .find(|v| !v.is_empty())
         .map(String::from_utf8)
