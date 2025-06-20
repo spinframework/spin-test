@@ -6,9 +6,12 @@ pub fn get_manifest() -> _rt::String {
     unsafe {
         #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
         #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
-        struct RetArea([::core::mem::MaybeUninit<u8>; 2 * ::core::mem::size_of::<*const u8>()]);
-        let mut ret_area =
-            RetArea([::core::mem::MaybeUninit::uninit(); 2 * ::core::mem::size_of::<*const u8>()]);
+        struct RetArea(
+            [::core::mem::MaybeUninit<u8>; 2 * ::core::mem::size_of::<*const u8>()],
+        );
+        let mut ret_area = RetArea(
+            [::core::mem::MaybeUninit::uninit(); 2 * ::core::mem::size_of::<*const u8>()],
+        );
         let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
         #[cfg(target_arch = "wasm32")]
         #[link(wasm_import_module = "$root")]
@@ -22,9 +25,7 @@ pub fn get_manifest() -> _rt::String {
         }
         unsafe { wit_import1(ptr0) };
         let l2 = *ptr0.add(0).cast::<*mut u8>();
-        let l3 = *ptr0
-            .add(::core::mem::size_of::<*const u8>())
-            .cast::<usize>();
+        let l3 = *ptr0.add(::core::mem::size_of::<*const u8>()).cast::<usize>();
         let len4 = l3;
         let bytes4 = _rt::Vec::from_raw_parts(l2.cast(), len4, len4);
         let result5 = _rt::string_lift(bytes4);
@@ -34,8 +35,7 @@ pub fn get_manifest() -> _rt::String {
 #[doc(hidden)]
 #[allow(non_snake_case)]
 pub unsafe fn _export_set_component_id_cabi<T: Guest>(arg0: *mut u8, arg1: usize) {
-    #[cfg(target_arch = "wasm32")]
-    _rt::run_ctors_once();
+    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
     let len0 = arg1;
     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
     T::set_component_id(_rt::string_lift(bytes0));
@@ -37454,7 +37454,9 @@ macro_rules! __export_env_impl {
 #[doc(inline)]
 pub(crate) use __export_env_impl as export;
 #[cfg(target_arch = "wasm32")]
-#[unsafe(link_section = "component-type:wit-bindgen:0.41.0:fermyon:spin-test-virt:env:encoded world")]
+#[unsafe(
+    link_section = "component-type:wit-bindgen:0.41.0:fermyon:spin-test-virt:env:encoded world"
+)]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
 pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 28152] = *b"\

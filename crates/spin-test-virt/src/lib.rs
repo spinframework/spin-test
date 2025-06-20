@@ -1,6 +1,7 @@
 mod helper;
 
 #[allow(warnings)]
+#[rustfmt::skip]
 mod bindings;
 mod manifest;
 mod wasi;
