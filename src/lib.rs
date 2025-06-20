@@ -11,7 +11,7 @@ pub use manifest::ManifestInformation;
 /// The built `spin-test-virt` component
 const SPIN_TEST_VIRT: &[u8] = include_bytes!(concat!(
     env!("OUT_DIR"),
-    "/wasm32-wasi/release/spin_test_virt.wasm"
+    "/wasm32-wasip1/release/spin_test_virt.wasm"
 ));
 /// The built `router` component
 const ROUTER: &[u8] = include_bytes!(concat!(
@@ -88,7 +88,7 @@ pub fn perform_composition(
 
     composition
         .encode(true)
-        .context("failed to encode composition")
+        .context("failed to encode composition of app and test components")
 }
 
 /// Virtualize app component with virtualized environment and router
@@ -126,7 +126,7 @@ pub fn virtualize_app(app_component: Component) -> anyhow::Result<Vec<u8>> {
 
     composition
         .encode(true)
-        .context("failed to encode composition")
+        .context("failed to encode composition of app and virtualized environment")
 }
 
 fn instantiate_test(
@@ -340,9 +340,9 @@ impl TestTarget {
         let decoded = wit_component::decode(&test.bytes)
             .context("failed to decode test component's wit package")?;
         let resolve = decoded.resolve();
-        let packages = &decoded.packages();
+        let package = decoded.package();
 
-        let world_id = resolve.select_world(packages, None)?;
+        let world_id = resolve.select_world(package, None)?;
         let world = &resolve.worlds[world_id];
 
         let mut exports = HashSet::new();
@@ -388,14 +388,17 @@ fn get_tests_list(
 ) -> Result<Vec<String>, anyhow::Error> {
     struct TestComponentData {
         table: wasmtime_wasi::ResourceTable,
-        ctx: wasmtime_wasi::WasiCtx,
+        ctx: wasmtime_wasi::p2::WasiCtx,
     }
 
-    impl wasmtime_wasi::WasiView for TestComponentData {
+    impl wasmtime_wasi::p2::IoView for TestComponentData {
         fn table(&mut self) -> &mut wasmtime_wasi::ResourceTable {
             &mut self.table
         }
-        fn ctx(&mut self) -> &mut wasmtime_wasi::WasiCtx {
+    }
+
+    impl wasmtime_wasi::p2::WasiView for TestComponentData {
+        fn ctx(&mut self) -> &mut wasmtime_wasi::p2::WasiCtx {
             &mut self.ctx
         }
     }
@@ -405,7 +408,7 @@ fn get_tests_list(
         &engine,
         TestComponentData {
             table: wasmtime_wasi::ResourceTable::default(),
-            ctx: wasmtime_wasi::WasiCtxBuilder::new()
+            ctx: wasmtime_wasi::p2::WasiCtxBuilder::new()
                 .inherit_stdout()
                 .inherit_stderr()
                 .build(),
@@ -416,7 +419,7 @@ fn get_tests_list(
 
     // Configure the linker including stubbing out all non-wasi imports
     let mut linker = wasmtime::component::Linker::<TestComponentData>::new(&engine);
-    wasmtime_wasi::add_to_linker_sync(&mut linker)
+    wasmtime_wasi::p2::add_to_linker_sync(&mut linker)
         .context("failed to link to wasi to the test component")?;
     stub_imports(&mut linker, world, resolve).context("failed to stub test component imports")?;
 

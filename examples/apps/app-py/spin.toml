@@ -18,6 +18,6 @@ key_value_stores = ["cache"]
 command = "componentize-py -w spin-http componentize app -o app.wasm"
 watch = ["app.py", "Pipfile"]
 [component.my-app.tool.spin-test]
-source = "../../test-rs/target/wasm32-wasi/release/wasm_test.wasm"
+source = "../../test-rs/target/wasm32-wasip1/release/wasm_test.wasm"
 build = "cargo component build --release --target-dir=target"
 workdir = "../../test-rs"

@@ -4,19 +4,18 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0"
+anyhow = { workspace = true }
 async-trait = "0.1"
 futures = "0.3"
-ipnet = "2.9"
+ipnet = "2.11"
 spin-expressions = { workspace = true }
 spin-manifest = { workspace = true }
-spin-outbound-networking = { workspace = true }
 spin-serde = { workspace = true }
-spin-locked-app = { git = "https://github.com/fermyon/spin" }
+spin-locked-app = { git = "https://github.com/spinframework/spin", rev = "1d48156da083843453ecaf627c7f976306a8210d" }
+spin-outbound-networking-config = { git = "https://github.com/spinframework/spin", rev = "1d48156da083843453ecaf627c7f976306a8210d" }
 toml = { workspace = true }
 wit-bindgen-rt = { workspace = true }
-# rusqlite > 0.25 fails to build with various linker errors
-rusqlite = { version = "0.25", features = ["bundled", "wasm32-wasi-vfs"] }
+rusqlite = { version = "0.36", features = ["bundled", "wasm32-wasi-vfs"] }
 
 
 [lib]

@@ -57,13 +57,15 @@ fn substitution(key: &str, value: &str) -> Option<String> {
 
 struct StoreData {
     manifest: String,
-    ctx: wasmtime_wasi::WasiCtx,
+    ctx: wasmtime_wasi::p2::WasiCtx,
     table: wasmtime::component::ResourceTable,
 }
 
 impl StoreData {
     fn new(manifest: String) -> Self {
-        let ctx = wasmtime_wasi::WasiCtxBuilder::new().inherit_stdio().build();
+        let ctx = wasmtime_wasi::p2::WasiCtxBuilder::new()
+            .inherit_stdio()
+            .build();
         let table = wasmtime::component::ResourceTable::default();
         Self {
             manifest,
@@ -73,12 +75,14 @@ impl StoreData {
     }
 }
 
-impl wasmtime_wasi::WasiView for StoreData {
-    fn table(&mut self) -> &mut wasmtime_wasi::ResourceTable {
+impl wasmtime_wasi::p2::IoView for StoreData {
+    fn table(&mut self) -> &mut wasmtime::component::ResourceTable {
         &mut self.table
     }
+}
 
-    fn ctx(&mut self) -> &mut wasmtime_wasi::WasiCtx {
+impl wasmtime_wasi::p2::WasiView for StoreData {
+    fn ctx(&mut self) -> &mut wasmtime_wasi::p2::WasiCtx {
         &mut self.ctx
     }
 }

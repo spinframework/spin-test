@@ -8,6 +8,7 @@ pub mod bindings {
     wit_bindgen::generate!({
         world: "test-imports",
         path: "../../host-wit",
+        generate_all
     });
 }
 
