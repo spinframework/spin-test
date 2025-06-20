@@ -349,7 +349,7 @@ struct IncomingBody<'a> {
     resource: wasmtime::component::ResourceAny,
 }
 
-impl<'a> IncomingBody<'a> {
+impl IncomingBody<'_> {
     fn stream<T>(
         &self,
         store: &mut wasmtime::Store<T>,
@@ -369,7 +369,7 @@ struct InputStream<'a> {
     resource: wasmtime::component::ResourceAny,
 }
 
-impl<'a> InputStream<'a> {
+impl InputStream<'_> {
     fn blocking_read<T>(
         &self,
         store: &mut wasmtime::Store<T>,
@@ -388,7 +388,7 @@ struct OutgoingBody<'a> {
     resource: wasmtime::component::ResourceAny,
 }
 
-impl<'a> OutgoingBody<'a> {
+impl OutgoingBody<'_> {
     fn write<T>(&self, store: &mut wasmtime::Store<T>) -> anyhow::Result<Result<OutputStream, ()>> {
         let stream = match self.guest.call_write(store, self.resource)? {
             Ok(s) => s,
@@ -406,7 +406,7 @@ struct OutputStream<'a> {
     resource: wasmtime::component::ResourceAny,
 }
 
-impl<'a> OutputStream<'a> {
+impl OutputStream<'_> {
     fn blocking_write_and_flush<T>(
         &self,
         store: &mut wasmtime::Store<T>,

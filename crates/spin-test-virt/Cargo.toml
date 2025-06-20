@@ -11,8 +11,8 @@ ipnet = "2.11"
 spin-expressions = { workspace = true }
 spin-manifest = { workspace = true }
 spin-serde = { workspace = true }
-spin-locked-app = { git = "https://github.com/spinframework/spin", rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
-spin-outbound-networking-config = { git = "https://github.com/spinframework/spin", rev = "9906b4e499e47bcc6ebff4e7fe70bb255a5f925d" }
+spin-locked-app = { git = "https://github.com/spinframework/spin", rev = "4447abb7d7571fc887217045aff0ba349a8de955" }
+spin-outbound-networking-config = { git = "https://github.com/spinframework/spin", rev = "4447abb7d7571fc887217045aff0ba349a8de955" }
 toml = { workspace = true }
 wit-bindgen-rt = { workspace = true }
 rusqlite = { version = "0.36", features = ["bundled", "wasm32-wasi-vfs"] }
