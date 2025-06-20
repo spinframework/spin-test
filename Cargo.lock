@@ -3230,6 +3230,7 @@ dependencies = [
  "spin-outbound-networking-config",
  "spin-serde",
  "toml",
+ "wasi 0.14.2+wasi-0.2.4",
  "wit-bindgen-rt 0.42.1",
 ]
 

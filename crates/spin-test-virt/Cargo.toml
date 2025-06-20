@@ -16,6 +16,7 @@ spin-outbound-networking-config = { git = "https://github.com/spinframework/spin
 toml = { workspace = true }
 wit-bindgen-rt = { workspace = true }
 rusqlite = { version = "0.36", features = ["bundled", "wasm32-wasi-vfs"] }
+wasi = "0.14"
 
 
 [lib]

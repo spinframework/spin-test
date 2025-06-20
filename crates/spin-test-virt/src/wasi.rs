@@ -13,7 +13,7 @@ use crate::Component;
 impl wasi::cli::stdout::Guest for Component {
     fn get_stdout() -> io::exports::streams::OutputStream {
         io::exports::streams::OutputStream::new(io::OutputStream::Host(
-            crate::bindings::wasi::cli::stdout::get_stdout(),
+            ::wasi::cli::stdout::get_stdout(),
         ))
     }
 }
@@ -27,7 +27,7 @@ impl wasi::cli::stdin::Guest for Component {
 impl wasi::cli::stderr::Guest for Component {
     fn get_stderr() -> wasi::cli::stderr::OutputStream {
         wasi::io::streams::OutputStream::new(io::OutputStream::Host(
-            crate::bindings::wasi::cli::stderr::get_stderr(),
+            ::wasi::cli::stderr::get_stderr(),
         ))
     }
 }
@@ -68,33 +68,33 @@ impl wasi::cli::terminal_input::GuestTerminalInput for TerminalInput {}
 
 impl wasi::random::random::Guest for Component {
     fn get_random_bytes(len: u64) -> Vec<u8> {
-        crate::bindings::wasi::random::random::get_random_bytes(len)
+        ::wasi::random::random::get_random_bytes(len)
     }
 
     fn get_random_u64() -> u64 {
-        crate::bindings::wasi::random::random::get_random_u64()
+        ::wasi::random::random::get_random_u64()
     }
 }
 
 impl wasi::random::insecure_seed::Guest for Component {
     fn insecure_seed() -> (u64, u64) {
-        crate::bindings::wasi::random::insecure_seed::insecure_seed()
+        ::wasi::random::insecure_seed::insecure_seed()
     }
 }
 
 impl wasi::random::insecure::Guest for Component {
     fn get_insecure_random_bytes(len: u64) -> Vec<u8> {
-        crate::bindings::wasi::random::insecure::get_insecure_random_bytes(len)
+        ::wasi::random::insecure::get_insecure_random_bytes(len)
     }
 
     fn get_insecure_random_u64() -> u64 {
-        crate::bindings::wasi::random::insecure::get_insecure_random_u64()
+        ::wasi::random::insecure::get_insecure_random_u64()
     }
 }
 
 impl wasi::clocks::wall_clock::Guest for Component {
     fn now() -> wasi::clocks::wall_clock::Datetime {
-        let now = crate::bindings::wasi::clocks::wall_clock::now();
+        let now = ::wasi::clocks::wall_clock::now();
         wasi::clocks::wall_clock::Datetime {
             seconds: now.seconds,
             nanoseconds: now.nanoseconds,
@@ -108,7 +108,7 @@ impl wasi::clocks::wall_clock::Guest for Component {
 
 impl wasi::clocks::monotonic_clock::Guest for Component {
     fn now() -> wasi::clocks::monotonic_clock::Instant {
-        crate::bindings::wasi::clocks::monotonic_clock::now()
+        ::wasi::clocks::monotonic_clock::now()
     }
 
     fn resolution() -> wasi::clocks::monotonic_clock::Duration {
@@ -130,7 +130,7 @@ impl wasi::cli::environment::Guest for Component {
     fn get_environment() -> Vec<(String, String)> {
         let Some(component) = crate::manifest::AppManifest::get_component() else {
             // If we don't have a component, we just accept the host environment
-            return crate::bindings::wasi::cli::environment::get_environment();
+            return ::wasi::cli::environment::get_environment();
         };
 
         component.environment.into_iter().collect()

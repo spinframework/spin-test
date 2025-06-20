@@ -6,7 +6,7 @@ use std::{
 };
 
 pub use crate::bindings::exports::wasi::http as exports;
-pub use crate::bindings::wasi::http as imports;
+pub use ::wasi::http as imports;
 
 use crate::bindings::exports::fermyon::spin_wasi_virt::http_handler;
 use crate::Component;

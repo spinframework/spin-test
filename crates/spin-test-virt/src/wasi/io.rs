@@ -7,8 +7,9 @@ use std::{
     },
 };
 
-pub use crate::bindings::{exports::wasi::io as exports, wasi::io as imports};
+pub use crate::bindings::exports::wasi::io as exports;
 use crate::Component;
+use ::wasi::io as imports;
 
 impl exports::error::Guest for Component {
     type Error = IoError;

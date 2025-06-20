@@ -87,7 +87,7 @@ pub fn perform_composition(
     }
 
     composition
-        .encode(true)
+        .encode(false)
         .context("failed to encode composition of app and test components")
 }
 
