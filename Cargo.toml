@@ -8,21 +8,21 @@ anyhow = { workspace = true }
 clap = { version = "4.5", features = ["derive"] }
 env_logger = "0.11"
 glob = "0.3"
-http-body-util = "0.1.1"
+http-body-util = "0.1"
 hyper = "1.0"
-libtest-mimic = "0.7"
+libtest-mimic = "0.8"
 log = "0.4"
-owo-colors = { version = "4.0.0", features = ["supports-colors"] }
-spin-common = { git = "https://github.com/fermyon/spin" }
-spin-componentize = { git = "https://github.com/fermyon/spin" }
-spin-http = { git = "https://github.com/fermyon/spin", default-features = false }
+owo-colors = { version = "4", features = ["supports-colors"] }
+spin-common = { git = "https://github.com/spinframework/spin", rev = "1d48156da083843453ecaf627c7f976306a8210d" }
+spin-componentize = { git = "https://github.com/spinframework/spin", rev = "1d48156da083843453ecaf627c7f976306a8210d" }
+spin-http = { git = "https://github.com/spinframework/spin", default-features = false, rev = "1d48156da083843453ecaf627c7f976306a8210d" }
 spin-manifest = { workspace = true }
-temp-dir = "0.1.13"
+temp-dir = "0.1.16"
 tokio = "1.0"
 toml = { workspace = true }
-wac-graph = "0.3"
-wasmtime = "22.0"
-wasmtime-wasi = "22.0"
+wac-graph = "0.7"
+wasmtime = "33.0"
+wasmtime-wasi = "33.0"
 wit-component = { workspace = true }
 wit-parser = { workspace = true }
 
@@ -36,11 +36,11 @@ members = [
 
 [workspace.dependencies]
 anyhow = "1.0"
-spin-expressions = { git = "https://github.com/fermyon/spin" }
-spin-manifest = { git = "https://github.com/fermyon/spin" }
-spin-outbound-networking = { git = "https://github.com/fermyon/spin" }
-spin-serde = { git = "https://github.com/fermyon/spin" }
+spin-expressions = { git = "https://github.com/spinframework/spin", rev = "1d48156da083843453ecaf627c7f976306a8210d" }
+spin-manifest = { git = "https://github.com/spinframework/spin", rev = "1d48156da083843453ecaf627c7f976306a8210d" }
+spin-factor-outbound-networking = { git = "https://github.com/spinframework/spin", rev = "1d48156da083843453ecaf627c7f976306a8210d" }
+spin-serde = { git = "https://github.com/spinframework/spin", rev = "1d48156da083843453ecaf627c7f976306a8210d" }
 toml = { version = "0.8", features = ["preserve_order"] }
-wit-bindgen-rt = { version = "0.26", features = ["bitflags"] }
-wit-component = "0.211"
-wit-parser = "0.211"
+wit-bindgen-rt = { version = "0.42", features = ["bitflags"] }
+wit-component = "0.235"
+wit-parser = "0.235"

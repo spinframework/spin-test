@@ -14,16 +14,16 @@ route = "/..."
 component = "my-app"
 
 [component.my-app]
-source = "../../../target/wasm32-wasi/release/my_app.wasm"
+source = "../../../target/wasm32-wasip1/release/my_app.wasm"
 allowed_outbound_hosts = ["https://my.api.com", "redis://redis"]
 key_value_stores = ["cache"]
 sqlite_databases = ["database"]
 [component.my-app.build]
-command = "cargo build --target wasm32-wasi --release"
+command = "cargo build --target wasm32-wasip1 --release"
 watch = ["src/**/*.rs", "Cargo.toml"]
 [component.my-app.variables]
 cache_name = "cache"
 [component.my-app.tool.spin-test]
-source = "../../test-rs/target/wasm32-wasi/release/wasm_test.wasm"
+source = "../../test-rs/target/wasm32-wasip1/release/wasm_test.wasm"
 build = "cargo component build --release --target-dir=target"
 workdir = "../../test-rs"

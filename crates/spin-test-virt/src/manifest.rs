@@ -3,6 +3,8 @@ use std::{
     sync::{OnceLock, RwLock},
 };
 
+use spin_outbound_networking_config::allowed_hosts::{AllowedHostsConfig, OutboundUrl};
+
 use crate::VARIABLE_RESOLVER;
 
 /// The manifest for the current Spin app.
@@ -20,20 +22,20 @@ thread_local! {
 
 impl AppManifest {
     /// Returns the allowed hosts configuration for the current component.
-    pub fn allowed_hosts() -> anyhow::Result<spin_outbound_networking::AllowedHostsConfig> {
+    pub fn allowed_hosts() -> anyhow::Result<AllowedHostsConfig> {
         let allowed_outbound_hosts = Self::get_component()
             .expect("internal error: component id not yet set")
             .normalized_allowed_outbound_hosts()?;
         PREPARED_RESOLVER.with(|resolver| {
             let resolver = resolver.as_ref().map_err(|e| anyhow::anyhow!("{e}"))?;
-            spin_outbound_networking::AllowedHostsConfig::parse(&allowed_outbound_hosts, resolver)
+            AllowedHostsConfig::parse(&allowed_outbound_hosts, resolver)
         })
     }
 
     /// Returns whether the given URL is allowed by the manifest.
     pub fn allows_url(url: &str, scheme: &str) -> anyhow::Result<bool> {
         let allowed_hosts = Self::allowed_hosts()?;
-        let url = spin_outbound_networking::OutboundUrl::parse(url, scheme)?;
+        let url = OutboundUrl::parse(url, scheme)?;
         Ok(allowed_hosts.allows(&url))
     }
 
@@ -60,7 +62,7 @@ impl AppManifest {
         Some(
             Self::get()
                 .components
-                .remove(&Self::get_component_id()?)
+                .swap_remove(&Self::get_component_id()?)
                 .expect("internal error: component not found in manifest"),
         )
     }

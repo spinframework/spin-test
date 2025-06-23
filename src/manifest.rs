@@ -63,6 +63,9 @@ impl ManifestInformation {
             spin_manifest::schema::v2::ComponentSource::Remote { .. } => {
                 anyhow::bail!("components with remote sources are not yet supported by `spin-test`")
             }
+            spin_manifest::schema::v2::ComponentSource::Registry { .. } => anyhow::bail!(
+                "components with registry sources are not yet supported by `spin-test`"
+            ),
         }
     }
 

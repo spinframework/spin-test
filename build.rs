@@ -34,8 +34,17 @@ fn ensure_wasi_sdk() -> Vec<(&'static str, String)> {
             clang_path.display()
         );
     }
+    let wasi_sysroot = format!("{}/{}", wasi_sdk_path_string, "share/wasi-sysroot");
+    if !std::path::Path::new(&wasi_sysroot).exists() {
+        panic!(
+            "WASI_SDK_PATH is set to a path that does not contain share/wasi-sysroot: {}",
+            wasi_sysroot
+        );
+    }
+
     vec![
         ("WASI_SDK_PATH", wasi_sdk_path_string),
+        ("CC", format!("{clang_path_string} --sysroot={wasi_sysroot}")),
         ("CC_wasm32_wasi", clang_path_string),
         ("LIBSQLITE3_FLAGS", "-DSQLITE_OS_OTHER -USQLITE_TEMP_STORE -DSQLITE_TEMP_STORE=3 -USQLITE_THREADSAFE 
         -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOCALTIME -DSQLITE_OMIT_LOAD_EXTENSION -DLONGDOUBLE_TYPE=double".to_string()),
@@ -68,7 +77,7 @@ fn cargo_component_build<'a>(
             "--target",
             match target {
                 Target::Wasm32UnknownUnknown => "wasm32-unknown-unknown",
-                Target::Wasm32Wasi => "wasm32-wasi",
+                Target::Wasm32Wasi => "wasm32-wasip1",
             },
             "--release",
             "--target-dir",
@@ -98,11 +107,7 @@ fn run<'a, 'b>(
 
     cmd.arg("-c");
     cmd.envs(env);
-    let c = args
-        .into_iter()
-        .map(Into::into)
-        .collect::<Vec<&str>>()
-        .join(" ");
+    let c = args.into_iter().collect::<Vec<_>>().join(" ");
     cmd.arg(&c);
 
     (c, cmd.output().unwrap())
